@@ -11,10 +11,9 @@ function App() {
       <header className="body-font text-gray-600">
         <div className="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
           <nav className="flex flex-wrap items-center justify-center text-base md:ml-4 md:py-1 md:pl-4">
-            <a className="mr-5 ">212</a>
-            <a className="mr-5 ">188</a>
+            <a className="mr-5 border-2">188</a>
             <a className="mr-5 ">137</a>
-            <a className="mr-5 border-2">113</a>
+            <a className="mr-5 ">113</a>
             <a className="mr-5 ">87</a>
             <a className="mr-5 ">37</a>
             <a className="mr-5 ">28</a>
@@ -56,10 +55,17 @@ function App() {
             </h1>
             <div className="grid grid-cols-2 gap-4">
               <button onClick={() => startMech(188)}>
-                (188) - Yellow Meteor
+                (188) - Yellow Meteor <br />
+                (First yellow meteor appears)
               </button>
-              <button>(137) - Shandi </button>
-              <button>(28) - Dreamworld</button>
+              <button>
+                (137) - Shandi <br />
+                (Brel goes to middle)
+              </button>
+              <button>
+                (28) - Dreamworld <br />
+                (Brel goes to middle)
+              </button>
             </div>
           </div>
         </div>
