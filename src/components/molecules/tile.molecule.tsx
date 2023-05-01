@@ -36,7 +36,7 @@ export default ({ tile }: Props) => {
       className={`flex aspect-square select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} ${
         !isActive ? "cursor-pointer" : "pointer-events-none cursor-not-allowed"
       }`}
-      onClick={() => updateTileHealth(tile.clock, -1)}
+      onClick={() => updateTileHealth(tile.order, -1)}
     >
       <div className="grid h-full w-full rotate-45 grid-rows-3 place-items-center">
         <span>{tile.clock}</span>
