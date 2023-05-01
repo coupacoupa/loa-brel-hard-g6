@@ -1,47 +1,9 @@
-import { useState } from "react";
 import "./App.css";
 import TileAtom from "./components/atoms/tile.atom";
-import { Tile } from "./types/game";
+import useGameInteraction from "./components/particles/hooks/useGameInteraction";
 
 function App() {
-  const [tiles, setTiles] = useState<Tile[]>([
-    {
-      clock: 12,
-      health: 3,
-    },
-    {
-      clock: 1,
-      health: 3,
-    },
-    {
-      clock: 3,
-      health: 3,
-    },
-    {
-      clock: 11,
-      health: 3,
-    },
-    {
-      clock: 0,
-      health: 14,
-    },
-    {
-      clock: 5,
-      health: 3,
-    },
-    {
-      clock: 9,
-      health: 3,
-    },
-    {
-      clock: 7,
-      health: 3,
-    },
-    {
-      clock: 6,
-      health: 3,
-    },
-  ]);
+  const { tiles, reset } = useGameInteraction();
 
   const onClick = () => {
     console.log("hello world");
