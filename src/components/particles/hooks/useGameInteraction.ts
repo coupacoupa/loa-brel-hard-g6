@@ -1,15 +1,38 @@
 import { useState } from "react";
-import { Tile, Tiles } from "../../../types/game";
-import { getStartingTiles } from "../game.util";
+import { Tiles } from "../../../types/game";
+import { getInitialHardPath, getStartingTiles } from "../game.util";
 
 export default () => {
   const [tiles, setTiles] = useState<Tiles>(getStartingTiles());
 
   const reset = () => {
-    setTiles(getStartingTiles());
+    const tilesWithMeteor = getStartingTiles();
+    const path = getInitialHardPath();
+
+    for (let i = 0; i < path.length; i++) {
+      const meteor = path[i];
+      tilesWithMeteor[meteor.clock].placement?.push({
+        order: i + 1,
+        type: meteor.type,
+      });
+    }
+
+    setTiles(tilesWithMeteor);
   };
 
-  const reduceTileHealth = () => {};
+  const updateTileHealth = (clock: number, modifier: number) => {
+    setTiles((prevTiles) => {
+      const updatedTile = {
+        ...prevTiles[clock],
+        health: prevTiles[clock].health + modifier,
+      };
 
-  return { tiles, reset };
+      return {
+        ...prevTiles,
+        [clock]: updatedTile,
+      };
+    });
+  };
+
+  return { tiles, reset, updateTileHealth };
 };
