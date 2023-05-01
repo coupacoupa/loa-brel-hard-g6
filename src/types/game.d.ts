@@ -6,6 +6,7 @@ export interface Tile {
   health: number;
   order: number;
   placement: Placement[];
+  destroyedBy188?: boolean;
 }
 export interface Placement {
   type: "BLUE" | "YELLOW";

@@ -4,7 +4,7 @@ import { useGameInteraction } from "./components/particles/context/game-interact
 import { Tile } from "./types/game";
 
 function App() {
-  const { tiles, resetGame, startMech, time } = useGameInteraction();
+  const { tiles, resetGame, startMech, nextBlueTime } = useGameInteraction();
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-10 space-y-24 px-8">
@@ -36,19 +36,7 @@ function App() {
           ))}
         </div>
         <div className="flex h-full flex-col gap-4">
-          <div>Next Blue Meteor: {time} seconds</div>
-          <div className="border">
-            <h1 className="mb-4 text-center text-base font-medium text-gray-900 sm:text-3xl">
-              Meteor
-            </h1>
-            <div className="grid grid-cols-2 gap-4">
-              <button>Drop Blue Recommended</button>
-              <button>Drop Yellow Recommended</button>
-              <button>Undo</button>
-              <button>Redo</button>
-              <button>Drop Yellow Manual</button>
-            </div>
-          </div>
+          <div>Next Blue Meteor: {nextBlueTime} seconds</div>
           <div className="border">
             <h1 className="mb-4 text-center text-base font-medium text-gray-900 sm:text-3xl">
               Mech Start
@@ -66,6 +54,18 @@ function App() {
                 (28) - Dreamworld <br />
                 (Brel goes to middle)
               </button>
+            </div>
+          </div>
+          <div className="border">
+            <h1 className="mb-4 text-center text-base font-medium text-gray-900 sm:text-3xl">
+              Meteor
+            </h1>
+            <div className="grid grid-cols-2 gap-4">
+              <button>Drop Blue Recommended</button>
+              <button>Drop Yellow Recommended</button>
+              <button>Undo</button>
+              <button>Redo</button>
+              <button>Drop Yellow Manual</button>
             </div>
           </div>
         </div>

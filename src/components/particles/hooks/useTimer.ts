@@ -4,7 +4,8 @@ export const useTimer = (initialTime: number, autoReset: boolean = false) => {
   const [time, setTime] = useState(initialTime);
   const [isActive, setIsActive] = useState(false);
 
-  const startTimer = () => {
+  const startTimer = (buffer?: number) => {
+    setTime(initialTime + (buffer ? buffer : 0));
     setIsActive(true);
   };
 

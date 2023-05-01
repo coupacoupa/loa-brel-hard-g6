@@ -2,6 +2,10 @@ import { useEffect } from "react";
 import { Tile } from "../../types/game";
 import { useGameInteraction } from "../particles/context/game-interaction.context";
 import { useTimer } from "../particles/hooks/useTimer";
+import {
+  TILE_RECOVERY,
+  YELLOW_APPEAR_TILL_DROP_BUFFER,
+} from "../particles/game.constant";
 
 interface Props {
   tile: Tile;
@@ -9,7 +13,7 @@ interface Props {
 
 export default ({ tile }: Props) => {
   const { updateTileHealth, resetTileHealth } = useGameInteraction();
-  const { time, startTimer, resetTimer, isActive } = useTimer(100);
+  const { time, startTimer, resetTimer, isActive } = useTimer(TILE_RECOVERY);
 
   const getTileColor = () => {
     if (tile.health > 2) return "bg-green-100";
@@ -20,9 +24,15 @@ export default ({ tile }: Props) => {
 
   useEffect(() => {
     if (tile.health <= 0) {
-      resetTimer();
-      startTimer();
+      console.log(tile);
+      startTimer(tile.destroyedBy188 ? YELLOW_APPEAR_TILL_DROP_BUFFER : 0);
+    } else {
+      if (isActive) {
+        // detect game reset
+        resetTimer();
+      }
     }
+    tile.destroyedBy188 = false;
   }, [tile.health]);
 
   useEffect(() => {
@@ -42,8 +52,9 @@ export default ({ tile }: Props) => {
         <span>{tile.clock}</span>
         <div>
           <div className="grid w-full grid-cols-2 place-items-center">
-            {tile.placement?.map((meteor) => (
+            {tile.placement?.map((meteor, i) => (
               <div
+                key={i}
                 className={`ml-2 flex h-6 w-6 items-center justify-center rounded-full ${
                   meteor.type === "YELLOW" ? "bg-yellow-200" : "bg-blue-200"
                 } text-xs text-gray-700`}
