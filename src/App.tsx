@@ -10,12 +10,17 @@ function App() {
   };
 
   return (
-    <div className="grid rotate-45 transform grid-cols-3 gap-2">
-      {tiles.map((tile, i) => (
-        <div key={i} className="-rotate-45 transform">
-          <TileAtom text={`${tile.clock} - ${tile.health}`} onClick={onClick} />
-        </div>
-      ))}
+    <div className="grid -rotate-45 transform grid-cols-3 gap-2">
+      {Object.values(tiles)
+        .sort((a, b) => a.order - b.order)
+        .map((tile, i) => (
+          <div key={i} className="rotate-45 transform">
+            <TileAtom
+              text={`${tile.clock} - ${tile.health}`}
+              onClick={onClick}
+            />
+          </div>
+        ))}
     </div>
   );
 }
