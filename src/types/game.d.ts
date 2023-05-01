@@ -7,11 +7,6 @@ export interface Tile {
   order: number;
   placement: Placement[];
 }
-
-export interface Meteor {
-  type: "BLUE" | "YELLOW";
-  clock: number;
-}
 export interface Placement {
   type: "BLUE" | "YELLOW";
   order: number;
