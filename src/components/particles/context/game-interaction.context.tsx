@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Tiles } from "../../../types/game";
+import { Placement, Tiles } from "../../../types/game";
+import { BLUE_DAMAGE, YELLOW_DAMAGE } from "../game.constant";
 import {
   getInitialHardPath,
   getNeighbourTiles,
+  getNextPlacement,
   getStartingTiles,
 } from "../game.util";
 import useBlueMeteor from "../hooks/useBlueMeteor";
-import { BLUE_DAMAGE, YELLOW_DAMAGE } from "../game.constant";
 
 interface Provider {
   children: JSX.Element;
@@ -21,6 +22,7 @@ interface Context {
   startBlueMeteor: () => void;
   resetBlueMeteor: () => void;
   startMech: (mech: 188 | 137 | 28) => void;
+  inputBlueMeteor: (order: number) => void;
 }
 
 const GameContext = createContext<Context>({
@@ -32,15 +34,31 @@ const GameContext = createContext<Context>({
   startBlueMeteor: () => {},
   resetBlueMeteor: () => {},
   startMech: () => {},
+  inputBlueMeteor: () => {},
 });
 
 export const GameInteractionProvider = ({ children }: Provider) => {
   const [tiles, setTiles] = useState<Tiles>(getStartingTiles());
-  const { nextBlueTime, startBlueMeteor, resetBlueMeteor } = useBlueMeteor();
+  const {
+    nextBlueTime,
+    nextBlueCount,
+    startBlueMeteor,
+    resetBlueMeteor,
+    inputBlueMeteor,
+    debouncedValue,
+  } = useBlueMeteor();
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     resetGame();
   }, []);
+
+  useEffect(() => {
+    if (started && debouncedValue.length > 0) {
+      // calculate next path
+      calculatePlacement(tiles);
+    }
+  }, [debouncedValue]);
 
   const resetGame = () => {
     const tilesWithMeteor = getStartingTiles();
@@ -56,6 +74,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     }
     setTiles(tilesWithMeteor);
     resetBlueMeteor();
+    setStarted(false);
   };
 
   const updateTileHealth = (order: number, modifier: number) => {
@@ -87,6 +106,8 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   };
 
   const startMech = (mech: 188 | 137 | 28) => {
+    setStarted(true);
+
     if (mech === 188) {
       handle188Mech();
     }
@@ -97,11 +118,20 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     const path = getInitialHardPath();
 
     // drop starting meteors
-    const updatedTiles = getStartingTiles();
+    const updatedTiles = handleDrop(getStartingTiles(), path, true);
 
+    // calculate new placements
+    calculatePlacement(updatedTiles);
+  };
+
+  const handleDrop = (
+    tiles: Tiles,
+    path: Placement[],
+    is118: boolean = false
+  ) => {
     for (let i = 0; i < path.length; i++) {
       const meteor = path[i];
-      const tile = updatedTiles[meteor.order];
+      const tile = tiles[meteor.order];
       const isYellow = meteor.type === "YELLOW";
 
       // skip dropping if tile already dead
@@ -109,7 +139,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
 
       // set current type state
       tile.health -= isYellow ? YELLOW_DAMAGE : BLUE_DAMAGE;
-      tile.destroyedBy188 = isYellow ? true : false;
+      tile.destroyedBy188 = is118 ? true : false;
       tile.placement = [];
 
       if (isYellow) {
@@ -117,13 +147,35 @@ export const GameInteractionProvider = ({ children }: Provider) => {
         const neighbours = getNeighbourTiles(meteor.order);
 
         for (let i = 0; i < neighbours.length; i++) {
-          updatedTiles[neighbours[i]].health -= 3;
-          updatedTiles[neighbours[i]].destroyedBy188 = true;
+          tiles[neighbours[i]].health -= 3;
+          tiles[neighbours[i]].destroyedBy188 = true;
         }
       }
     }
 
-    setTiles(updatedTiles);
+    setTiles(tiles);
+
+    return tiles;
+  };
+
+  const calculatePlacement = (currentTiles: Tiles) => {
+    const tilesWithMeteor = { ...currentTiles };
+    const path = getNextPlacement(nextBlueCount, tiles, false);
+
+    // reset current placements
+    for (const tile of Object.values(tilesWithMeteor)) {
+      tile.placement = [];
+    }
+
+    // set new placements
+    for (let i = 0; i < path.length; i++) {
+      const meteor = path[i];
+      tilesWithMeteor[meteor.order].placement?.push({
+        order: i + 1,
+        type: meteor.type,
+      });
+    }
+    setTiles(tilesWithMeteor);
   };
 
   return (
@@ -137,6 +189,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
         startBlueMeteor,
         resetBlueMeteor,
         startMech,
+        inputBlueMeteor,
       }}
     >
       {children}

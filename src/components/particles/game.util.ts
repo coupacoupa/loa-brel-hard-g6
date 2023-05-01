@@ -1,4 +1,4 @@
-import { Placement, Tiles } from "../../types/game";
+import { Placement, Tile, Tiles } from "../../types/game";
 
 export const getStartingTiles = (): Tiles => {
   return {
@@ -128,4 +128,57 @@ export const getNeighbourTiles = (cellIndex: number): number[] => {
   }
 
   return neighboringCells;
+};
+
+export const getNextPlacement = (
+  nextBlueCount: number,
+  tiles: Tiles,
+  shandi: boolean
+) => {
+  // priority to place on (clock 11,12,1 order 1,2,5) or (clock 5,6,7 order 3,6,7)
+  // max efficiency would be 3,2,2 = 7 damage before yellow
+
+  // get number of tiles already destroyed
+  const currentDestroyed = Object.values(tiles).reduce(
+    (count: number, tile: Tile) => {
+      if (tile.health <= 0) {
+        return count + 1;
+      }
+      return count;
+    },
+    0
+  );
+
+  let canDestroy = currentDestroyed === 0 && !shandi;
+
+  // count number of damage on both sides and get higher of both
+  const topHealth = tiles[1].health + tiles[2].health + tiles[5].health;
+  const bottomHealth = tiles[3].health + tiles[6].health + tiles[7].health;
+
+  // get which have lower health
+  const priorityOrder =
+    topHealth <= bottomHealth
+      ? [1, 2, 5, 3, 6, 7, 0, 8, 4]
+      : [3, 6, 7, 1, 2, 5, 0, 8, 4];
+
+  // fills placements based on priority first
+  // if both filled, then fill spare left right
+  const path: Placement[] = [];
+  const history: { [order: number]: number } = {};
+
+  for (let i = 0; i < nextBlueCount; i++) {
+    const healthRequirement = canDestroy ? 2 : 1;
+
+    for (const order of priorityOrder) {
+      const damageFromHistory = history[order] ? history[order] : 0;
+
+      if (tiles[order].health - damageFromHistory > healthRequirement) {
+        history[order] = history[order] ? history[order]++ : 1;
+        path.push({ order, type: "BLUE" });
+        break;
+      }
+    }
+  }
+
+  return path;
 };

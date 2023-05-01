@@ -63,8 +63,6 @@ function App() {
             <div className="grid grid-cols-2 gap-4">
               <button>Drop Blue Recommended</button>
               <button>Drop Yellow Recommended</button>
-              <button>Undo</button>
-              <button>Redo</button>
               <button>Drop Yellow Manual</button>
             </div>
           </div>

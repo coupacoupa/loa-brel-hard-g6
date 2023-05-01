@@ -1,5 +1,5 @@
 export interface Tiles {
-  [clock: number]: Tile;
+  [order: number]: Tile;
 }
 export interface Tile {
   clock: number;

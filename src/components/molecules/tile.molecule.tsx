@@ -12,7 +12,8 @@ interface Props {
 }
 
 export default ({ tile }: Props) => {
-  const { updateTileHealth, resetTileHealth } = useGameInteraction();
+  const { updateTileHealth, resetTileHealth, inputBlueMeteor } =
+    useGameInteraction();
   const { time, startTimer, resetTimer, isActive } = useTimer(TILE_RECOVERY);
 
   const getTileColor = () => {
@@ -24,7 +25,6 @@ export default ({ tile }: Props) => {
 
   useEffect(() => {
     if (tile.health <= 0) {
-      console.log(tile);
       startTimer(tile.destroyedBy188 ? YELLOW_APPEAR_TILL_DROP_BUFFER : 0);
     } else {
       if (isActive) {
@@ -46,7 +46,10 @@ export default ({ tile }: Props) => {
       className={`flex aspect-square select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} ${
         !isActive ? "cursor-pointer" : "pointer-events-none cursor-not-allowed"
       }`}
-      onClick={() => updateTileHealth(tile.order, -1)}
+      onClick={() => {
+        inputBlueMeteor(tile.order);
+        updateTileHealth(tile.order, -1);
+      }}
     >
       <div className="grid h-full w-full rotate-45 grid-rows-3 place-items-center">
         <span>{tile.clock}</span>
