@@ -59,7 +59,7 @@ export const stackAndBreak = (tiles: Tiles, nextBlueCount: number) => {
   }
 
   // fill remainder by priority
-  return [...path, ...fillByPriority(tiles, remainder, [priorityOrder[0]])];
+  return [...path, ...fillByPriority(tiles, remainder, path)];
 };
 
 export const fillByPriority = (
@@ -84,7 +84,8 @@ export const fillByPriority = (
       const damageFromHistory = history[order] ? history[order] : 0;
 
       if (tiles[order].health - damageFromHistory > 1) {
-        history[order] = history[order] ? history[order]++ : 1;
+        console.log("chosen this", tiles[order].health, damageFromHistory);
+        history[order] = history[order] ? history[order] + 1 : 1;
         path.push(order);
         break;
       }
