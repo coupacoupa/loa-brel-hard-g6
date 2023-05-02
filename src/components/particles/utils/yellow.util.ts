@@ -1,5 +1,13 @@
-import { Tiles } from "../../../types/game";
-import { YELLOW_DAMAGE } from "../game.constant";
+import { Tiles } from "../types/game";
+import {
+  ALLOWED_YELLOW_DROP_LOCATIONS,
+  YELLOW_DAMAGE,
+} from "../constants/game.constant";
+import {
+  MECH_MILESTONE,
+  YELLOW_METEOR_MECH_NAME,
+} from "../constants/mech.constant";
+import { getDirectionPriority } from "./game.util";
 
 export const getNeighbourTiles = (cellIndex: number): number[] => {
   const cellsPerRow = 3;
@@ -35,7 +43,7 @@ export const getNeighbourTiles = (cellIndex: number): number[] => {
   return neighboringCells;
 };
 
-export const handleYellowDrop = (
+export const calculateYellowDamage = (
   tiles: Tiles,
   order: number,
   is118: boolean = false
@@ -44,13 +52,34 @@ export const handleYellowDrop = (
   const tile = tiles[order];
   tile.health -= YELLOW_DAMAGE;
   tile.destroyedBy188 = is118 ? true : false;
-  tile.placement = { ...tile.placement, yellow: undefined };
+  tile.placement = { ...tile.placement, yellow: false };
 
   // splash neighbours if yellow
   const neighbours = getNeighbourTiles(order);
 
   for (let i = 0; i < neighbours.length; i++) {
     tiles[neighbours[i]].health -= 3;
-    tiles[neighbours[i]].destroyedBy188 = true;
+    tiles[neighbours[i]].destroyedBy188 = is118 ? true : false;
   }
+};
+
+export const getNextYellowHealth = (currentMechIndex: number) => {
+  const mechIndexes = MECH_MILESTONE.filter((milestone, i) => {
+    return milestone.name === YELLOW_METEOR_MECH_NAME && i >= currentMechIndex;
+  });
+
+  return mechIndexes.length > 0 ? mechIndexes[0].health : undefined;
+};
+
+export const getNextYellowPlacement = (tiles: Tiles) => {
+  console.log("calculating next yellow placement");
+
+  // get which have lower health
+  const priorityOrder = getDirectionPriority(tiles).filter((x) => {
+    return ALLOWED_YELLOW_DROP_LOCATIONS.includes(x) && tiles[x].health > 0;
+  });
+
+  console.log("yellow order", priorityOrder);
+
+  return priorityOrder[0];
 };

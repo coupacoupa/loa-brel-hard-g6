@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BLUE_METEOR_INTERVAL } from "../game.constant";
+import { BLUE_METEOR_INTERVAL } from "../constants/game.constant";
 import { useTimer } from "./useTimer";
 import useDebounce from "./useDebounce";
 

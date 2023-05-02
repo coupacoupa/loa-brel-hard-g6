@@ -1,8 +1,12 @@
-import { Tiles, Tile, Placement } from "../../../types/game";
-import { BLUE_DAMAGE } from "../game.constant";
+import {
+  BLUE_DAMAGE,
+  CORNER_TILES,
+  SPARE_TILES,
+} from "../constants/game.constant";
+import { Path, Tile, Tiles } from "../types/game";
 import { getDirectionPriority } from "./game.util";
 
-export const getNextPlacement = (
+export const getNextBluePlacement = (
   nextBlueCount: number,
   tiles: Tiles,
   shandi: boolean
@@ -26,10 +30,49 @@ export const getNextPlacement = (
 
   let canDestroy = currentDestroyed === 0 && !shandi;
 
-  // count number of damage on both sides and get higher of both
+  // stack and break
+  if (canDestroy) {
+    return stackAndBreak(tiles, nextBlueCount);
+  }
 
+  // count number of damage on both sides and get higher of both
+  return fillByPriority(tiles, nextBlueCount);
+};
+
+export const stackAndBreak = (tiles: Tiles, nextBlueCount: number) => {
   // get which have lower health
-  const priorityOrder = getDirectionPriority(tiles);
+  const priorityOrder = getDirectionPriority(tiles)
+    .filter((order) => !CORNER_TILES.includes(order))
+    .filter((order) => {
+      return tiles[order].health === 1 || tiles[order].health === 2;
+    });
+
+  console.log("stack priority debug", priorityOrder);
+  let remainder = nextBlueCount;
+  const path: number[] = [];
+
+  if (priorityOrder.length > 0) {
+    // push two to path
+    path.push(priorityOrder[0]);
+    path.push(priorityOrder[0]);
+    remainder -= 2;
+  }
+
+  // fill remainder by priority
+  return [...path, ...fillByPriority(tiles, remainder, [priorityOrder[0]])];
+};
+
+export const fillByPriority = (
+  tiles: Tiles,
+  nextBlueCount: number,
+  excludeList: number[] = []
+) => {
+  // get which have lower health
+  const priorityOrder = [...getDirectionPriority(tiles), ...SPARE_TILES]
+    .filter((x) => !excludeList.includes(x))
+    .filter((order) => tiles[order].health > 1);
+
+  console.log("priority debug", priorityOrder);
 
   // fills placements based on priority first
   // if both filled, then fill spare left right
@@ -37,12 +80,10 @@ export const getNextPlacement = (
   const history: { [order: number]: number } = {};
 
   for (let i = 0; i < nextBlueCount; i++) {
-    const healthRequirement = canDestroy ? 2 : 1;
-
     for (const order of priorityOrder) {
       const damageFromHistory = history[order] ? history[order] : 0;
 
-      if (tiles[order].health - damageFromHistory > healthRequirement) {
+      if (tiles[order].health - damageFromHistory > 1) {
         history[order] = history[order] ? history[order]++ : 1;
         path.push(order);
         break;
@@ -50,12 +91,10 @@ export const getNextPlacement = (
     }
   }
 
-  console.log("Calculated placement path", path);
-
   return path;
 };
 
-export const handleBlueDrop = (tiles: Tiles, path: Placement) => {
+export const calculateBlueDamage = (tiles: Tiles, path: Path) => {
   for (let i = 0; i < path.blue.length; i++) {
     const order = path.blue[i];
     const tile = tiles[order];
