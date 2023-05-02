@@ -45,7 +45,6 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     startBlueMeteor,
     resetBlueMeteor,
     inputBlueMeteor,
-    debouncedValue,
   } = useBlueMeteor();
   const [started, setStarted] = useState(false);
 
@@ -54,23 +53,20 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   }, []);
 
   useEffect(() => {
-    if (started && debouncedValue.length > 0) {
-      // calculate next path
+    if (started) {
+      // calculate next path triggered by manual blue meteors
       calculatePlacement(tiles);
     }
-  }, [debouncedValue]);
+  }, [nextBlueCount]);
 
   const resetGame = () => {
     const tilesWithMeteor = getStartingTiles();
     const path = getInitialHardPath();
 
-    for (let i = 0; i < path.length; i++) {
-      const meteor = path[i];
-      tilesWithMeteor[meteor.order].destroyedBy188 = undefined;
-      tilesWithMeteor[meteor.order].placement?.push({
-        order: i + 1,
-        type: meteor.type,
-      });
+    for (let i = 0; i < path.blue.length; i++) {
+      const order = path.blue[i];
+      tilesWithMeteor[order].destroyedBy188 = undefined;
+      tilesWithMeteor[order].placement?.blue.push(i + 1);
     }
     setTiles(tilesWithMeteor);
     resetBlueMeteor();
@@ -118,62 +114,70 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     const path = getInitialHardPath();
 
     // drop starting meteors
-    const updatedTiles = handleDrop(getStartingTiles(), path, true);
+    let updatedTiles = handleYellowDrop(
+      getStartingTiles(),
+      path.yellow || -1,
+      true
+    );
+    updatedTiles = handleBlueDrop(updatedTiles, path);
 
     // calculate new placements
     calculatePlacement(updatedTiles);
   };
 
-  const handleDrop = (
+  const handleYellowDrop = (
     tiles: Tiles,
-    path: Placement[],
+    order: number,
     is118: boolean = false
   ) => {
-    for (let i = 0; i < path.length; i++) {
-      const meteor = path[i];
-      const tile = tiles[meteor.order];
-      const isYellow = meteor.type === "YELLOW";
+    // set damage
+    const tile = tiles[order];
+    tile.health -= YELLOW_DAMAGE;
+    tile.destroyedBy188 = is118 ? true : false;
+    tile.placement = { ...tile.placement, yellow: undefined };
+
+    // splash neighbours if yellow
+    const neighbours = getNeighbourTiles(order);
+
+    for (let i = 0; i < neighbours.length; i++) {
+      tiles[neighbours[i]].health -= 3;
+      tiles[neighbours[i]].destroyedBy188 = true;
+    }
+
+    setTiles(tiles);
+    return tiles;
+  };
+
+  const handleBlueDrop = (tiles: Tiles, path: Placement) => {
+    for (let i = 0; i < path.blue.length; i++) {
+      const order = path.blue[i];
+      const tile = tiles[order];
 
       // skip dropping if tile already dead
       if (tile.health <= 0) continue;
 
       // set current type state
-      tile.health -= isYellow ? YELLOW_DAMAGE : BLUE_DAMAGE;
-      tile.destroyedBy188 = is118 ? true : false;
-      tile.placement = [];
-
-      if (isYellow) {
-        // splash neighbours if yellow
-        const neighbours = getNeighbourTiles(meteor.order);
-
-        for (let i = 0; i < neighbours.length; i++) {
-          tiles[neighbours[i]].health -= 3;
-          tiles[neighbours[i]].destroyedBy188 = true;
-        }
-      }
+      tile.health -= BLUE_DAMAGE;
+      tile.placement = { ...tile.placement, blue: [] };
     }
 
     setTiles(tiles);
-
     return tiles;
   };
 
   const calculatePlacement = (currentTiles: Tiles) => {
     const tilesWithMeteor = { ...currentTiles };
-    const path = getNextPlacement(nextBlueCount, tiles, false);
+    const path = getNextPlacement(nextBlueCount, tilesWithMeteor, false);
 
     // reset current placements
     for (const tile of Object.values(tilesWithMeteor)) {
-      tile.placement = [];
+      tile.placement = { blue: [], yellow: undefined };
     }
 
     // set new placements
     for (let i = 0; i < path.length; i++) {
-      const meteor = path[i];
-      tilesWithMeteor[meteor.order].placement?.push({
-        order: i + 1,
-        type: meteor.type,
-      });
+      const order = path[i];
+      tilesWithMeteor[order].placement?.blue.push(i + 1);
     }
     setTiles(tilesWithMeteor);
   };

@@ -22,6 +22,7 @@ export default () => {
   const resetBlueMeteor = () => {
     resetTimer();
     setNextBlueCount(2);
+    console.log("reset blue");
   };
 
   const inputBlueMeteor = (order: number) => {
@@ -34,11 +35,9 @@ export default () => {
 
       // set next blue meteor count
       // order will be 2 first then 3,4,3,4,3,4...
-      if (nextBlueCount === 3) {
-        setNextBlueCount(4);
-      } else {
-        setNextBlueCount(3);
-      }
+      const newCount = nextBlueCount === 3 ? 4 : 3;
+      console.log("next blue meteor count", newCount);
+      setNextBlueCount(newCount);
     }
   }, [debouncedValue]);
 

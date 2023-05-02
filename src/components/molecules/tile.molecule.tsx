@@ -55,14 +55,17 @@ export default ({ tile }: Props) => {
         <span>{tile.clock}</span>
         <div>
           <div className="grid w-full grid-cols-2 place-items-center">
-            {tile.placement?.map((meteor, i) => (
+            {tile.placement?.yellow ? (
+              <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700">
+                {tile.placement.yellow}
+              </div>
+            ) : undefined}
+            {tile.placement?.blue.map((order, i) => (
               <div
                 key={i}
-                className={`ml-2 flex h-6 w-6 items-center justify-center rounded-full ${
-                  meteor.type === "YELLOW" ? "bg-yellow-200" : "bg-blue-200"
-                } text-xs text-gray-700`}
+                className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700"
               >
-                {meteor.order}
+                {order}
               </div>
             ))}
           </div>
