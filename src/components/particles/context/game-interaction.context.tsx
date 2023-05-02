@@ -105,17 +105,9 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   };
 
   const resetTileHealth = (order: number) => {
-    setTiles((prevTiles) => {
-      const updatedTile = {
-        ...prevTiles[order],
-        health: 3,
-      };
+    tiles[order].health = 3;
 
-      return {
-        ...prevTiles,
-        [order]: updatedTile,
-      };
-    });
+    calculatePlacement(tiles, nextBlueCount);
   };
 
   const startMech = (mech: 188 | 137 | 28) => {

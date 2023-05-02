@@ -1,4 +1,4 @@
-export const YELLOW_APPEAR_TILL_DROP_BUFFER = 13;
+export const YELLOW_APPEAR_TILL_DROP_BUFFER = 0;
 export const TILE_RECOVERY = 10;
 export const BLUE_METEOR_INTERVAL = 80;
 export const YELLOW_DAMAGE = 3;
