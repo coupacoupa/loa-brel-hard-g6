@@ -1,19 +1,24 @@
 import { useEffect } from "react";
-import { Tile } from "../../types/game";
-import { useGameInteraction } from "../particles/context/game-interaction.context";
-import { useTimer } from "../particles/hooks/useTimer";
 import {
   TILE_RECOVERY,
   YELLOW_APPEAR_TILL_DROP_BUFFER,
-} from "../particles/game.constant";
+} from "../particles/constants/game.constant";
+import { useGameInteraction } from "../particles/context/game-interaction.context";
+import { useTimer } from "../particles/hooks/useTimer";
+import { Tile } from "../particles/types/game";
+import { getNextYellowHealth } from "../particles/utils/yellow.util";
 
 interface Props {
   tile: Tile;
 }
 
 export default ({ tile }: Props) => {
-  const { updateTileHealth, resetTileHealth, inputBlueMeteor } =
-    useGameInteraction();
+  const {
+    updateTileHealth,
+    resetTileHealth,
+    inputBlueMeteor,
+    currentMechIndex,
+  } = useGameInteraction();
   const { time, startTimer, resetTimer, isActive } = useTimer(TILE_RECOVERY);
 
   const getTileColor = () => {
@@ -22,6 +27,8 @@ export default ({ tile }: Props) => {
     if (tile.health === 2) return "bg-orange-100";
     if (tile.health === 1) return "bg-red-100";
   };
+
+  const nextYellow = getNextYellowHealth(currentMechIndex);
 
   useEffect(() => {
     if (tile.health <= 0) {
@@ -55,9 +62,9 @@ export default ({ tile }: Props) => {
         <span>{tile.clock}</span>
         <div>
           <div className="grid w-full grid-cols-2 place-items-center">
-            {tile.placement?.yellow ? (
-              <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700">
-                {tile.placement.yellow}
+            {tile.placement?.yellow && nextYellow ? (
+              <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-200 text-xs text-gray-700">
+                {nextYellow}
               </div>
             ) : undefined}
             {tile.placement?.blue.map((order, i) => (

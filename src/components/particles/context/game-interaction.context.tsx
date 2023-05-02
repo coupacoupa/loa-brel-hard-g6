@@ -1,13 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Placement, Tiles } from "../../../types/game";
-import { BLUE_DAMAGE, YELLOW_DAMAGE } from "../game.constant";
-import {
-  getInitialHardPath,
-  getNeighbourTiles,
-  getNextPlacement,
-  getStartingTiles,
-} from "../game.util";
 import useBlueMeteor from "../hooks/useBlueMeteor";
+import { Tiles } from "../types/game";
+import { calculateBlueDamage } from "../utils/blue.util";
+import {
+  calculatePlacement,
+  getInitialHardPath,
+  getStartingTiles,
+} from "../utils/game.util";
+import {
+  calculateYellowDamage,
+  getNextYellowPlacement,
+} from "../utils/yellow.util";
 
 interface Provider {
   children: JSX.Element;
@@ -23,6 +26,9 @@ interface Context {
   resetBlueMeteor: () => void;
   startMech: (mech: 188 | 137 | 28) => void;
   inputBlueMeteor: (order: number) => void;
+  currentMechIndex: number;
+  setCurrentMechIndex: React.Dispatch<React.SetStateAction<number>>;
+  dropYellowMeteor: (order?: number) => void;
 }
 
 const GameContext = createContext<Context>({
@@ -35,6 +41,9 @@ const GameContext = createContext<Context>({
   resetBlueMeteor: () => {},
   startMech: () => {},
   inputBlueMeteor: () => {},
+  currentMechIndex: 0,
+  setCurrentMechIndex: () => {},
+  dropYellowMeteor: () => {},
 });
 
 export const GameInteractionProvider = ({ children }: Provider) => {
@@ -47,6 +56,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     inputBlueMeteor,
   } = useBlueMeteor();
   const [started, setStarted] = useState(false);
+  const [currentMechIndex, setCurrentMechIndex] = useState<number>(0);
 
   useEffect(() => {
     resetGame();
@@ -55,11 +65,12 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   useEffect(() => {
     if (started) {
       // calculate next path triggered by manual blue meteors
-      calculatePlacement(tiles);
+      calculatePlacement(tiles, nextBlueCount);
     }
   }, [nextBlueCount]);
 
   const resetGame = () => {
+    console.log("reset");
     const tilesWithMeteor = getStartingTiles();
     const path = getInitialHardPath();
 
@@ -68,9 +79,15 @@ export const GameInteractionProvider = ({ children }: Provider) => {
       tilesWithMeteor[order].destroyedBy188 = undefined;
       tilesWithMeteor[order].placement?.blue.push(i + 1);
     }
+
+    if (path.yellow) {
+      tilesWithMeteor[path.yellow].placement.yellow = true;
+    }
+
     setTiles(tilesWithMeteor);
     resetBlueMeteor();
     setStarted(false);
+    setCurrentMechIndex(0);
   };
 
   const updateTileHealth = (order: number, modifier: number) => {
@@ -110,76 +127,33 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   };
 
   const handle188Mech = () => {
+    // start blue meteor timer
     startBlueMeteor();
+
+    // get recommended path
     const path = getInitialHardPath();
+    let updatedTiles = getStartingTiles();
 
     // drop starting meteors
-    let updatedTiles = handleYellowDrop(
-      getStartingTiles(),
-      path.yellow || -1,
-      true
-    );
-    updatedTiles = handleBlueDrop(updatedTiles, path);
+    calculateYellowDamage(updatedTiles, path.yellow || -1, true);
+    calculateBlueDamage(updatedTiles, path);
 
     // calculate new placements
-    calculatePlacement(updatedTiles);
+    calculatePlacement(updatedTiles, nextBlueCount);
+
+    // update with placement
+    setTiles(updatedTiles);
+
+    // set to next mech
+    setCurrentMechIndex(currentMechIndex + 1);
   };
 
-  const handleYellowDrop = (
-    tiles: Tiles,
-    order: number,
-    is118: boolean = false
-  ) => {
-    // set damage
-    const tile = tiles[order];
-    tile.health -= YELLOW_DAMAGE;
-    tile.destroyedBy188 = is118 ? true : false;
-    tile.placement = { ...tile.placement, yellow: undefined };
+  const dropYellowMeteor = (order?: number) => {
+    // if order undefined :: drop on recommended slot
+    calculateYellowDamage(tiles, order ? order : getNextYellowPlacement(tiles));
 
-    // splash neighbours if yellow
-    const neighbours = getNeighbourTiles(order);
-
-    for (let i = 0; i < neighbours.length; i++) {
-      tiles[neighbours[i]].health -= 3;
-      tiles[neighbours[i]].destroyedBy188 = true;
-    }
-
-    setTiles(tiles);
-    return tiles;
-  };
-
-  const handleBlueDrop = (tiles: Tiles, path: Placement) => {
-    for (let i = 0; i < path.blue.length; i++) {
-      const order = path.blue[i];
-      const tile = tiles[order];
-
-      // skip dropping if tile already dead
-      if (tile.health <= 0) continue;
-
-      // set current type state
-      tile.health -= BLUE_DAMAGE;
-      tile.placement = { ...tile.placement, blue: [] };
-    }
-
-    setTiles(tiles);
-    return tiles;
-  };
-
-  const calculatePlacement = (currentTiles: Tiles) => {
-    const tilesWithMeteor = { ...currentTiles };
-    const path = getNextPlacement(nextBlueCount, tilesWithMeteor, false);
-
-    // reset current placements
-    for (const tile of Object.values(tilesWithMeteor)) {
-      tile.placement = { blue: [], yellow: undefined };
-    }
-
-    // set new placements
-    for (let i = 0; i < path.length; i++) {
-      const order = path[i];
-      tilesWithMeteor[order].placement?.blue.push(i + 1);
-    }
-    setTiles(tilesWithMeteor);
+    // calculate new placements
+    calculatePlacement(tiles, nextBlueCount);
   };
 
   return (
@@ -194,6 +168,9 @@ export const GameInteractionProvider = ({ children }: Provider) => {
         resetBlueMeteor,
         startMech,
         inputBlueMeteor,
+        currentMechIndex,
+        setCurrentMechIndex,
+        dropYellowMeteor,
       }}
     >
       {children}

@@ -1,10 +1,11 @@
 import "./App.css";
 import TileMolecule from "./components/molecules/tile.molecule";
 import { useGameInteraction } from "./components/particles/context/game-interaction.context";
-import { Tile } from "./types/game";
+import { Tile } from "./components/particles/types/game";
 
 function App() {
-  const { tiles, resetGame, startMech, nextBlueTime } = useGameInteraction();
+  const { tiles, resetGame, startMech, nextBlueTime, dropYellowMeteor } =
+    useGameInteraction();
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-10 space-y-24 px-8">
@@ -47,7 +48,7 @@ function App() {
                 (First yellow meteor appears)
               </button>
               <button>
-                (137) - Shandi <br />
+                (113) - Shandi <br />
                 (Brel goes to middle)
               </button>
               <button>
@@ -62,7 +63,9 @@ function App() {
             </h1>
             <div className="grid grid-cols-2 gap-4">
               <button>Drop Blue Recommended</button>
-              <button>Drop Yellow Recommended</button>
+              <button onClick={() => dropYellowMeteor()}>
+                Drop Yellow Recommended
+              </button>
               <button>Drop Yellow Manual</button>
             </div>
           </div>

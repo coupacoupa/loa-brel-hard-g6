@@ -11,5 +11,10 @@ export interface Tile {
 
 export interface Placement {
   blue: number[];
-  yellow?: number;
+  yellow: boolean;
+}
+
+export interface Path {
+  blue: number[];
+  yellow: number;
 }
