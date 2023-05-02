@@ -162,9 +162,7 @@ const getDirectionPriority = (tiles: Tiles) => {
   sectionsWithHealth.sort((a, b) => b.health - a.health);
 
   const sortedIndices = [
-    ...new Set(
-      sectionsWithHealth.flatMap((section, i) => TILES_DIRECTION_ORDER[i])
-    ),
+    ...new Set(sectionsWithHealth.flatMap((_, i) => TILES_DIRECTION_ORDER[i])),
   ];
   console.log("priority order", sortedIndices);
 
