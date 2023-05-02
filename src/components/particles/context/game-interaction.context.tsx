@@ -1,14 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Placement, Tiles } from "../../../types/game";
-import { BLUE_DAMAGE, YELLOW_DAMAGE } from "../game.constant";
+import { Tiles } from "../../../types/game";
+import useBlueMeteor from "../hooks/useBlueMeteor";
+import { handleBlueDrop } from "../utils/blue.util";
 import {
   calculatePlacement,
   getInitialHardPath,
   getStartingTiles,
 } from "../utils/game.util";
-import useBlueMeteor from "../hooks/useBlueMeteor";
-import { getNextPlacement, handleBlueDrop } from "../utils/blue.util";
-import { getNeighbourTiles, handleYellowDrop } from "../utils/yellow.util";
+import { handleYellowDrop } from "../utils/yellow.util";
 
 interface Provider {
   children: JSX.Element;
