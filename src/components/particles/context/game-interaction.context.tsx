@@ -2,12 +2,13 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Placement, Tiles } from "../../../types/game";
 import { BLUE_DAMAGE, YELLOW_DAMAGE } from "../game.constant";
 import {
+  calculatePlacement,
   getInitialHardPath,
-  getNeighbourTiles,
-  getNextPlacement,
   getStartingTiles,
-} from "../game.util";
+} from "../utils/game.util";
 import useBlueMeteor from "../hooks/useBlueMeteor";
+import { getNextPlacement, handleBlueDrop } from "../utils/blue.util";
+import { getNeighbourTiles, handleYellowDrop } from "../utils/yellow.util";
 
 interface Provider {
   children: JSX.Element;
@@ -55,7 +56,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   useEffect(() => {
     if (started) {
       // calculate next path triggered by manual blue meteors
-      calculatePlacement(tiles);
+      calculatePlacement(tiles, nextBlueCount);
     }
   }, [nextBlueCount]);
 
@@ -110,76 +111,22 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   };
 
   const handle188Mech = () => {
+    // start blue meteor timer
     startBlueMeteor();
+
+    // get recommended path
     const path = getInitialHardPath();
+    let updatedTiles = getStartingTiles();
 
     // drop starting meteors
-    let updatedTiles = handleYellowDrop(
-      getStartingTiles(),
-      path.yellow || -1,
-      true
-    );
-    updatedTiles = handleBlueDrop(updatedTiles, path);
+    handleYellowDrop(updatedTiles, path.yellow || -1, true);
+    handleBlueDrop(updatedTiles, path);
 
     // calculate new placements
-    calculatePlacement(updatedTiles);
-  };
+    calculatePlacement(updatedTiles, nextBlueCount);
 
-  const handleYellowDrop = (
-    tiles: Tiles,
-    order: number,
-    is118: boolean = false
-  ) => {
-    // set damage
-    const tile = tiles[order];
-    tile.health -= YELLOW_DAMAGE;
-    tile.destroyedBy188 = is118 ? true : false;
-    tile.placement = { ...tile.placement, yellow: undefined };
-
-    // splash neighbours if yellow
-    const neighbours = getNeighbourTiles(order);
-
-    for (let i = 0; i < neighbours.length; i++) {
-      tiles[neighbours[i]].health -= 3;
-      tiles[neighbours[i]].destroyedBy188 = true;
-    }
-
-    setTiles(tiles);
-    return tiles;
-  };
-
-  const handleBlueDrop = (tiles: Tiles, path: Placement) => {
-    for (let i = 0; i < path.blue.length; i++) {
-      const order = path.blue[i];
-      const tile = tiles[order];
-
-      // skip dropping if tile already dead
-      if (tile.health <= 0) continue;
-
-      // set current type state
-      tile.health -= BLUE_DAMAGE;
-      tile.placement = { ...tile.placement, blue: [] };
-    }
-
-    setTiles(tiles);
-    return tiles;
-  };
-
-  const calculatePlacement = (currentTiles: Tiles) => {
-    const tilesWithMeteor = { ...currentTiles };
-    const path = getNextPlacement(nextBlueCount, tilesWithMeteor, false);
-
-    // reset current placements
-    for (const tile of Object.values(tilesWithMeteor)) {
-      tile.placement = { blue: [], yellow: undefined };
-    }
-
-    // set new placements
-    for (let i = 0; i < path.length; i++) {
-      const order = path[i];
-      tilesWithMeteor[order].placement?.blue.push(i + 1);
-    }
-    setTiles(tilesWithMeteor);
+    // update with placement
+    setTiles(updatedTiles);
   };
 
   return (
