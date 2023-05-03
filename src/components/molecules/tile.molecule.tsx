@@ -1,24 +1,16 @@
 import { useEffect } from "react";
-import {
-  TILE_RECOVERY,
-  YELLOW_APPEAR_TILL_DROP_BUFFER,
-} from "../particles/constants/game.constant";
+import { TILE_RECOVERY } from "../particles/constants/game.constant";
 import { useGameInteraction } from "../particles/context/game-interaction.context";
 import { useTimer } from "../particles/hooks/useTimer";
 import { Tile } from "../particles/types/game";
-import { getNextYellowHealth } from "../particles/utils/yellow.util";
 
 interface Props {
   tile: Tile;
 }
 
 export default ({ tile }: Props) => {
-  const {
-    updateTileHealth,
-    resetTileHealth,
-    inputBlueMeteor,
-    currentMechIndex,
-  } = useGameInteraction();
+  const { inputBlueMeteor, placement, recalculatePlacement } =
+    useGameInteraction();
   const { time, startTimer, resetTimer, isActive } = useTimer(TILE_RECOVERY);
 
   const getTileColor = () => {
@@ -28,46 +20,39 @@ export default ({ tile }: Props) => {
     if (tile.health === 1) return "bg-red-100";
   };
 
-  const nextYellow = getNextYellowHealth(currentMechIndex);
-
   useEffect(() => {
     if (tile.health <= 0) {
-      startTimer(tile.destroyedBy188 ? YELLOW_APPEAR_TILL_DROP_BUFFER : 0);
-    } else {
-      if (isActive) {
-        // detect game reset
-        resetTimer();
+      if (!isActive) {
+        startTimer();
       }
+    } else {
+      resetTimer();
     }
-    tile.destroyedBy188 = false;
   }, [tile.health]);
 
   useEffect(() => {
     if (time <= 0) {
-      resetTileHealth(tile.order);
+      tile.health = 3;
+      recalculatePlacement();
     }
   }, [time]);
 
   return (
     <a
-      className={`flex aspect-square select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} ${
-        !isActive ? "cursor-pointer" : "pointer-events-none cursor-not-allowed"
-      }`}
+      className={`flex aspect-square cursor-pointer select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} `}
       onClick={() => {
         inputBlueMeteor(tile.order);
-        updateTileHealth(tile.order, -1);
+        tile.health--;
       }}
     >
       <div className="grid h-full w-full rotate-45 grid-rows-3 place-items-center">
         <span>{tile.clock}</span>
         <div>
           <div className="grid w-full grid-cols-2 place-items-center">
-            {tile.placement?.yellow && nextYellow ? (
-              <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-200 text-xs text-gray-700">
-                {nextYellow}
-              </div>
+            {placement[tile.order]?.yellow ? (
+              <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-200 text-xs text-gray-700"></div>
             ) : undefined}
-            {tile.placement?.blue.map((order, i) => (
+            {placement[tile.order]?.blue.map((order, i) => (
               <div
                 key={i}
                 className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700"

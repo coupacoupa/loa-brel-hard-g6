@@ -84,7 +84,6 @@ export const fillByPriority = (
       const damageFromHistory = history[order] ? history[order] : 0;
 
       if (tiles[order].health - damageFromHistory > 1) {
-        console.log("chosen this", tiles[order].health, damageFromHistory);
         history[order] = history[order] ? history[order] + 1 : 1;
         path.push(order);
         break;
@@ -105,6 +104,5 @@ export const calculateBlueDamage = (tiles: Tiles, path: Path) => {
 
     // set current type state
     tile.health -= BLUE_DAMAGE;
-    tile.placement = { ...tile.placement, blue: [] };
   }
 };
