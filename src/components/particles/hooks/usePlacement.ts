@@ -12,7 +12,10 @@ export default () => {
 
     // set new yellow placements
     const order = getNextYellowPlacement(currentTiles);
-    newPlacement[order].yellow = true;
+
+    if (order) {
+      newPlacement[order].yellow = true;
+    }
 
     // set new blue placements
     const path = getNextBluePlacement(nextBlueCount, currentTiles, false);
