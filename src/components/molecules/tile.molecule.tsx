@@ -3,6 +3,7 @@ import { TILE_RECOVERY } from "../particles/constants/game.constant";
 import { useGameInteraction } from "../particles/context/game-interaction.context";
 import { useTimer } from "../particles/hooks/useTimer";
 import { Tile } from "../particles/types/game";
+import IndicatorAtom from "../atoms/indicator.atom";
 
 interface Props {
   tile: Tile;
@@ -43,7 +44,7 @@ export default ({ tile }: Props) => {
 
   return (
     <a
-      className={`flex aspect-square w-28 cursor-pointer select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} `}
+      className={`flex aspect-square w-28 cursor-pointer select-none flex-col items-center justify-center border-2 border-primary hover:border-primary-focus ${getTileColor()}`}
       onClick={() => {
         inputBlueMeteor(tile.order);
         tile.health--;
@@ -51,21 +52,14 @@ export default ({ tile }: Props) => {
     >
       <div className="grid h-full rotate-45 grid-rows-3 place-items-center">
         {placement[tile.order]?.yellow ? (
-          <div className="border-1 flex h-7 w-7 items-center justify-center rounded-full bg-yellow-300 text-xs text-gray-700">
-            {tile.clock}
-          </div>
+          <IndicatorAtom size={7} background="yellow" text={tile.clock} />
         ) : (
           <div>{tile.clock}</div>
         )}
         <div>
           <div className="flex w-full flex-auto place-items-center gap-2">
             {placement[tile.order]?.blue.map((order, i) => (
-              <div
-                key={i}
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700"
-              >
-                {order}
-              </div>
+              <IndicatorAtom key={i} size={6} background="blue" text={order} />
             ))}
           </div>
         </div>

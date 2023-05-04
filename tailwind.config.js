@@ -4,5 +4,14 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  daisyui: {
+    themes: ["cupcake"],
+  },
+  safelist: [
+    { pattern: /w-.+/ },
+    { pattern: /h-.+/ },
+    { pattern: /border-.+/ },
+    { pattern: /bg-.+/ },
+  ],
+  plugins: [require("daisyui")],
 };
