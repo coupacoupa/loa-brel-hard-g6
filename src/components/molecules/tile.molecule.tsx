@@ -21,10 +21,7 @@ export default ({ tile }: Props) => {
   };
 
   const getTileHealthColor = () => {
-    if (tile.health > 2) return "text-green-400";
     if (tile.health < 1) return "text-gray-400";
-    if (tile.health === 2) return "text-orange-400";
-    if (tile.health === 1) return "text-red-400";
   };
 
   useEffect(() => {
@@ -52,7 +49,7 @@ export default ({ tile }: Props) => {
         tile.health--;
       }}
     >
-      <div className="grid h-full w-full rotate-45 grid-rows-3 place-items-center">
+      <div className="grid h-full rotate-45 grid-rows-3 place-items-center">
         {placement[tile.order]?.yellow ? (
           <div className="border-1 flex h-7 w-7 items-center justify-center rounded-full bg-yellow-300 text-xs text-gray-700">
             {tile.clock}
