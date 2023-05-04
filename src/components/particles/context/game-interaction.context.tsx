@@ -14,31 +14,32 @@ interface Context {
   tiles: Tiles;
   setTiles: React.Dispatch<React.SetStateAction<Tiles>>;
   resetGame: () => void;
-  resetBlueMeteor: () => void;
   start: () => void;
   inputBlueMeteor: (order: number) => void;
   dropYellowMeteor: (order: number) => void;
   nextBlueCount: number;
   placement: Placement;
   recalculatePlacement: () => void;
+  blueInput: number[];
 }
 
 const GameContext = createContext<Context>({
   tiles: {},
   setTiles: () => {},
   resetGame: () => {},
-  resetBlueMeteor: () => {},
   start: () => {},
   inputBlueMeteor: () => {},
   dropYellowMeteor: () => {},
   nextBlueCount: 2,
   placement: {},
   recalculatePlacement: () => {},
+  blueInput: [],
 });
 
 export const GameInteractionProvider = ({ children }: Provider) => {
   const [tiles, setTiles] = useState<Tiles>(getStartingTiles());
-  const { nextBlueCount, resetBlueMeteor, inputBlueMeteor } = useBlueMeteor();
+  const { nextBlueCount, resetBlueMeteor, inputBlueMeteor, blueInput } =
+    useBlueMeteor();
   const { placement, calculatePlacement, resetPlacement } = usePlacement();
 
   useEffect(() => {
@@ -98,13 +99,13 @@ export const GameInteractionProvider = ({ children }: Provider) => {
         tiles,
         setTiles,
         resetGame,
-        resetBlueMeteor,
         start,
         inputBlueMeteor,
         dropYellowMeteor,
         nextBlueCount,
         placement,
         recalculatePlacement,
+        blueInput,
       }}
     >
       {children}

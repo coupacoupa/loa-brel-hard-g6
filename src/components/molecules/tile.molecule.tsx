@@ -20,6 +20,13 @@ export default ({ tile }: Props) => {
     if (tile.health === 1) return "bg-red-100";
   };
 
+  const getTileHealthColor = () => {
+    if (tile.health > 2) return "text-green-400";
+    if (tile.health < 1) return "text-gray-400";
+    if (tile.health === 2) return "text-orange-400";
+    if (tile.health === 1) return "text-red-400";
+  };
+
   useEffect(() => {
     if (tile.health <= 0) {
       if (!isActive) {
@@ -39,30 +46,35 @@ export default ({ tile }: Props) => {
 
   return (
     <a
-      className={`flex aspect-square cursor-pointer select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} `}
+      className={`flex aspect-square w-28 cursor-pointer select-none flex-col items-center justify-center border-2 border-current ${getTileColor()} `}
       onClick={() => {
         inputBlueMeteor(tile.order);
         tile.health--;
       }}
     >
       <div className="grid h-full w-full rotate-45 grid-rows-3 place-items-center">
-        <span>{tile.clock}</span>
+        {placement[tile.order]?.yellow ? (
+          <div className="border-1 flex h-7 w-7 items-center justify-center rounded-full bg-yellow-300 text-xs text-gray-700">
+            {tile.clock}
+          </div>
+        ) : (
+          <div>{tile.clock}</div>
+        )}
         <div>
-          <div className="grid w-full grid-cols-2 place-items-center">
-            {placement[tile.order]?.yellow ? (
-              <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-200 text-xs text-gray-700"></div>
-            ) : undefined}
+          <div className="flex w-full flex-auto place-items-center gap-2">
             {placement[tile.order]?.blue.map((order, i) => (
               <div
                 key={i}
-                className="ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700"
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-200 text-xs text-gray-700"
               >
                 {order}
               </div>
             ))}
           </div>
         </div>
-        <div>{isActive ? time : tile.health}</div>
+        <div className={`${getTileHealthColor()}`}>
+          {isActive ? time : tile.health}
+        </div>
       </div>
     </a>
   );
