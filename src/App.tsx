@@ -97,6 +97,21 @@ function App() {
                 />
               ))}
             </div>
+            <h1 className="mb-4 mt-6 text-center text-base font-medium text-gray-900 sm:text-3xl">
+              How to use
+            </h1>
+            <div>
+              <ol>
+                <li>1) Click start when yellow meteor first drops</li>
+                <li>2) Click on tile to drop blue meteor</li>
+                <li>
+                  3) Blue Input on right panel indicates <br />
+                  how many blue meteor to drop
+                </li>
+                <li>5) Click yellow buttons to drop yellow meteor</li>
+                <li>6) Click reset to reset to first step</li>
+              </ol>
+            </div>
           </div>
         </div>
       </div>
