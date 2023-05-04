@@ -24,7 +24,7 @@ function App() {
           </h1>
           <div className="grid grid-cols-2 gap-4">
             <button onClick={() => start()}>START</button>
-            <button onClick={() => resetGame()}>RESET GAME</button>
+            <button onClick={() => resetGame()}>RESET</button>
           </div>
         </div>
       </div>
