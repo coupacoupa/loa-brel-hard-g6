@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { Placement, Tiles } from "../types/game";
 import { getNextBluePlacement } from "../utils/blue.util";
-import { getEmptyPlacement, getInitialHardPath } from "../utils/game.util";
+import {
+  getEmptyPlacement,
+  getInitialHardPath,
+  getStartingTiles,
+} from "../utils/game.util";
 import { getNextYellowPlacement } from "../utils/yellow.util";
 
 export default () => {
   const [placement, setPlacement] = useState<Placement>(getEmptyPlacement());
+  const [placementClock, setPlacementClock] = useState<number[]>([]);
 
   const calculatePlacement = (currentTiles: Tiles, nextBlueCount: number) => {
     const newPlacement: Placement = { ...getEmptyPlacement() };
@@ -25,6 +30,12 @@ export default () => {
     }
 
     setPlacement(newPlacement);
+
+    // convert path to clock
+    const tiles = getStartingTiles();
+    const clock = path.map((key) => tiles[key].clock);
+
+    setPlacementClock(clock);
   };
 
   const resetPlacement = () => {
@@ -41,6 +52,7 @@ export default () => {
       newPlacement[path.yellow].yellow = true;
     }
 
+    setPlacementClock([]);
     setPlacement(newPlacement);
   };
 
@@ -48,5 +60,6 @@ export default () => {
     placement,
     calculatePlacement,
     resetPlacement,
+    placementClock,
   };
 };
