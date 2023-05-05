@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonAtom from "./components/atoms/button.atom";
 import IndicatorAtom from "./components/atoms/indicator.atom";
 import TileMolecule from "./components/molecules/tile.molecule";
@@ -6,6 +6,8 @@ import { YELLOW_THRESHOLD } from "./components/particles/constants/game.constant
 import { useGameInteraction } from "./components/particles/context/game-interaction.context";
 import { Tile } from "./components/particles/types/game";
 import NavbarTemplate from "./components/templates/navbar.template";
+import InfoTemplate from "./components/templates/info.template";
+import { useTimer } from "./components/particles/hooks/useTimer";
 
 function App() {
   const {
@@ -15,9 +17,19 @@ function App() {
     dropYellowMeteor,
     blueInput,
     nextBlueCount,
+    placementClock,
   } = useGameInteraction();
 
   const [yellowDropped, setYellowDropped] = useState(0);
+  const { startTimer, isActive } = useTimer(1);
+  const [isAutocopy, setIsAutocopy] = useState(false);
+
+  useEffect(() => {
+    if (isAutocopy) {
+      navigator.clipboard.writeText(placementClock.join(" "));
+      startTimer();
+    }
+  }, [placementClock]);
 
   return (
     <div className="h-full">
@@ -48,55 +60,84 @@ function App() {
             />
           </div>
           <div className="rounded-xl bg-info-content p-6">
-            <h1 className="mb-4 text-center text-base font-medium sm:text-3xl">
-              Mech Start
-            </h1>
-            <div className="grid grid-cols-2 gap-4">
-              <ButtonAtom
-                text="START"
-                type="btn-primary"
-                onClick={() => {
-                  start();
-                  setYellowDropped(yellowDropped + 1);
-                }}
-              />
-              <ButtonAtom
-                text="RESET"
-                type="btn-primary"
-                onClick={() => {
-                  resetGame();
-                  setYellowDropped(0);
-                }}
-              />
-            </div>
-            <h1 className="mb-4 mt-6 text-center text-base font-medium sm:text-3xl">
-              Blue Input
-            </h1>
-            <div className="grid w-3/4 grid-cols-4">
-              {Array.from({ length: nextBlueCount }, (_, i) => (
-                <IndicatorAtom
-                  key={i}
-                  size={8}
-                  background="blue"
-                  focused={i < blueInput.length}
-                  text={i + 1}
+            <InfoTemplate title="Mech Start">
+              <div className="grid w-full grid-cols-2 gap-2">
+                <ButtonAtom
+                  text="START"
+                  type="btn-primary"
+                  onClick={() => {
+                    start();
+                    setYellowDropped(yellowDropped + 1);
+                  }}
                 />
-              ))}
-            </div>
-            <h1 className="mb-4 mt-6 text-center text-base font-medium sm:text-3xl">
-              Yellow Meteor
-            </h1>
-            <div className="grid w-3/4 grid-cols-4">
-              {Array.from(YELLOW_THRESHOLD, (_, i) => (
-                <IndicatorAtom
-                  key={i}
-                  size={8}
-                  background="yellow"
-                  focused={i < yellowDropped}
-                  text={YELLOW_THRESHOLD[i]}
+                <ButtonAtom
+                  text="RESET"
+                  type="btn-primary"
+                  onClick={() => {
+                    resetGame();
+                    setYellowDropped(0);
+                  }}
                 />
-              ))}
-            </div>
+              </div>
+            </InfoTemplate>
+            <InfoTemplate title="Blue Input">
+              <div className="grid w-3/4 grid-cols-4 place-items-center gap-2">
+                {Array.from({ length: nextBlueCount }, (_, i) => (
+                  <IndicatorAtom
+                    key={i}
+                    size={8}
+                    background="blue"
+                    focused={i < blueInput.length}
+                    text={i + 1}
+                  />
+                ))}
+              </div>
+            </InfoTemplate>
+            <InfoTemplate title="Yellow Meteor">
+              <div className="grid w-3/4 grid-cols-4 place-items-center gap-2">
+                {Array.from(YELLOW_THRESHOLD, (_, i) => (
+                  <IndicatorAtom
+                    key={i}
+                    size={8}
+                    background="yellow"
+                    focused={i < yellowDropped}
+                    text={YELLOW_THRESHOLD[i]}
+                  />
+                ))}
+              </div>
+            </InfoTemplate>
+            <InfoTemplate title="Clipboard">
+              <div>
+                <div className="form-control grid w-full grid-cols-3 gap-2 ">
+                  <div className="col-span-2">
+                    <input
+                      type="text"
+                      className="input-bordered input w-full max-w-xs"
+                      value={placementClock.join(" ")}
+                      disabled
+                    />
+                    <label className="label cursor-pointer">
+                      <span className="label-text">Enable Autocopy</span>
+                      <input
+                        type="checkbox"
+                        className="toggle-primary toggle"
+                        onChange={(e) => {
+                          setIsAutocopy(e.target.checked);
+                        }}
+                      ></input>
+                    </label>
+                  </div>
+                  <ButtonAtom
+                    text={isActive ? "Copied" : "Copy"}
+                    type="btn-primary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(placementClock.join(" "));
+                      startTimer();
+                    }}
+                  />
+                </div>
+              </div>
+            </InfoTemplate>
           </div>
         </div>
       </div>

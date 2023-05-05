@@ -21,6 +21,7 @@ interface Context {
   placement: Placement;
   recalculatePlacement: () => void;
   blueInput: number[];
+  placementClock: number[];
 }
 
 const GameContext = createContext<Context>({
@@ -34,13 +35,15 @@ const GameContext = createContext<Context>({
   placement: {},
   recalculatePlacement: () => {},
   blueInput: [],
+  placementClock: [],
 });
 
 export const GameInteractionProvider = ({ children }: Provider) => {
   const [tiles, setTiles] = useState<Tiles>(getStartingTiles());
   const { nextBlueCount, resetBlueMeteor, inputBlueMeteor, blueInput } =
     useBlueMeteor();
-  const { placement, calculatePlacement, resetPlacement } = usePlacement();
+  const { placement, calculatePlacement, resetPlacement, placementClock } =
+    usePlacement();
 
   useEffect(() => {
     resetGame();
@@ -106,6 +109,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
         placement,
         recalculatePlacement,
         blueInput,
+        placementClock,
       }}
     >
       {children}
