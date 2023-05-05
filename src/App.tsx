@@ -20,7 +20,7 @@ function App() {
   const [yellowDropped, setYellowDropped] = useState(0);
 
   return (
-    <div className="h-full bg-white">
+    <div className="h-full">
       <NavbarOrganism />
       <div className="flex w-full flex-col items-center justify-center gap-10 space-y-24 px-8 pt-20">
         <div className="grid grid-cols-3 gap-12">
@@ -47,8 +47,8 @@ function App() {
               }}
             />
           </div>
-          <div>
-            <h1 className="mb-4 text-center text-base font-medium text-gray-900 sm:text-3xl">
+          <div className="rounded-xl bg-info-content p-6">
+            <h1 className="mb-4 text-center text-base font-medium sm:text-3xl">
               Mech Start
             </h1>
             <div className="grid grid-cols-2 gap-4">
@@ -69,7 +69,7 @@ function App() {
                 }}
               />
             </div>
-            <h1 className="mb-4 mt-6 text-center text-base font-medium text-gray-900 sm:text-3xl">
+            <h1 className="mb-4 mt-6 text-center text-base font-medium sm:text-3xl">
               Blue Input
             </h1>
             <div className="grid w-3/4 grid-cols-4">
@@ -78,12 +78,12 @@ function App() {
                   key={i}
                   size={8}
                   background="blue"
-                  border={i < blueInput.length ? "blue" : undefined}
+                  focused={i < blueInput.length}
                   text={i + 1}
                 />
               ))}
             </div>
-            <h1 className="mb-4 mt-6 text-center text-base font-medium text-gray-900 sm:text-3xl">
+            <h1 className="mb-4 mt-6 text-center text-base font-medium sm:text-3xl">
               Yellow Meteor
             </h1>
             <div className="grid w-3/4 grid-cols-4">
@@ -92,15 +92,15 @@ function App() {
                   key={i}
                   size={8}
                   background="yellow"
-                  border={i < yellowDropped ? "yellow" : undefined}
+                  focused={i < yellowDropped}
                   text={YELLOW_THRESHOLD[i]}
                 />
               ))}
             </div>
-            <h1 className="mb-4 mt-6 text-center text-base font-medium text-gray-900 sm:text-3xl">
+            <h1 className="mb-4 mt-6 hidden text-center text-base font-medium sm:text-3xl md:block">
               How to use
             </h1>
-            <div>
+            <div className="hidden md:block">
               <ol>
                 <li>1) Click start when yellow meteor first drops</li>
                 <li>2) Click on tile to drop blue meteor</li>

@@ -15,14 +15,14 @@ export default ({ tile }: Props) => {
   const { time, startTimer, resetTimer, isActive } = useTimer(TILE_RECOVERY);
 
   const getTileColor = () => {
-    if (tile.health > 2) return "bg-green-100";
-    if (tile.health < 1) return "bg-gray-100";
-    if (tile.health === 2) return "bg-orange-100";
-    if (tile.health === 1) return "bg-red-100";
+    if (tile.health > 2) return "bg-green-300";
+    if (tile.health < 1) return "bg-gray-400";
+    if (tile.health === 2) return "bg-orange-300";
+    if (tile.health === 1) return "bg-red-300";
   };
 
   const getTileHealthColor = () => {
-    if (tile.health < 1) return "text-gray-400";
+    if (tile.health < 1) return "text-gray-600";
   };
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default ({ tile }: Props) => {
 
   return (
     <a
-      className={`flex aspect-square w-28 cursor-pointer select-none flex-col items-center justify-center border-2 border-primary hover:border-primary-focus ${getTileColor()}`}
+      className={`flex aspect-square w-28 cursor-pointer select-none flex-col items-center justify-center text-neutral hover:border-2 hover:border-secondary-focus ${getTileColor()}`}
       onClick={() => {
         inputBlueMeteor(tile.order);
         tile.health--;
@@ -64,7 +64,7 @@ export default ({ tile }: Props) => {
           </div>
         </div>
         <div className={`${getTileHealthColor()}`}>
-          {isActive ? time : tile.health}
+          {isActive ? time : undefined}
         </div>
       </div>
     </a>
