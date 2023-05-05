@@ -1,16 +1,18 @@
 interface Props {
   text: number;
-  border?: string;
+  focused?: boolean;
   background: string;
   size: number;
 }
 
-export default ({ text, border, background, size }: Props) => {
+export default ({ text, focused = false, background, size }: Props) => {
   return (
     <div
-      className={`flex h-${size} w-${size} items-center justify-center rounded-full text-xs text-gray-700 ${
-        border ? `border-2 border-${border}-600` : undefined
-      } bg-${background}-200`}
+      className={`flex h-${size} w-${size} items-center justify-center rounded-full text-xs text-neutral ${
+        focused
+          ? `bg-${background}-500 border-2 border-${background}-600`
+          : `bg-${background}-300`
+      }`}
     >
       {text}
     </div>

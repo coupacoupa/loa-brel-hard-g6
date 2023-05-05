@@ -1,6 +1,6 @@
 export default () => {
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-base-300">
       <div className="flex-1">
         <a className="btn-ghost btn text-xl normal-case">
           Brel Hard Calculator
@@ -10,7 +10,7 @@ export default () => {
         <div className="dropdown-end dropdown">
           <label tabIndex={0} className="btn-ghost btn-circle avatar btn">
             <div
-              className="w-10 rounded-full"
+              className="w-10 rounded-full border-2 border-gray-300 bg-gray-300"
               onClick={() =>
                 window.open("https://github.com/coupacoupa/loa-brel-hard-g6")
               }
