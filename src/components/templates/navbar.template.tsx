@@ -15,7 +15,8 @@ export default () => {
               <li>1) Click START when yellow meteor first destoy tiles</li>
               <li>2) Click on tile to drop blue meteor</li>
               <li>3) Blue Input indicates how many blue meteor to drop</li>
-              <li>5) Click yellow buttons to drop yellow meteor</li>
+              <li>4) Click yellow buttons to drop yellow meteor</li>
+              <li>5) Enable autocopy to copy placement on recommendations</li>
               <li>6) Click RESET to reset raid</li>
             </ol>
           </div>
