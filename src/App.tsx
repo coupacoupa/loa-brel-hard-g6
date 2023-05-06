@@ -4,10 +4,10 @@ import IndicatorAtom from "./components/atoms/indicator.atom";
 import TileMolecule from "./components/molecules/tile.molecule";
 import { YELLOW_THRESHOLD } from "./components/particles/constants/game.constant";
 import { useGameInteraction } from "./components/particles/context/game-interaction.context";
-import { Tile } from "./components/particles/types/game";
-import NavbarTemplate from "./components/templates/navbar.template";
-import InfoTemplate from "./components/templates/info.template";
 import { useTimer } from "./components/particles/hooks/useTimer";
+import { Tile } from "./components/particles/types/game";
+import InfoTemplate from "./components/templates/info.template";
+import NavbarTemplate from "./components/templates/navbar.template";
 
 function App() {
   const {
@@ -21,11 +21,12 @@ function App() {
   } = useGameInteraction();
 
   const [yellowDropped, setYellowDropped] = useState(0);
-  const { startTimer, isActive } = useTimer(1);
+  const { startTimer, resetTimer, isActive } = useTimer(1);
   const [isAutocopy, setIsAutocopy] = useState(false);
 
   useEffect(() => {
     if (isAutocopy) {
+      resetTimer();
       navigator.clipboard.writeText(placementClock.join(" "));
       startTimer();
     }
@@ -131,6 +132,7 @@ function App() {
                     text={isActive ? "Copied" : "Copy"}
                     type="btn-primary"
                     onClick={() => {
+                      resetTimer();
                       navigator.clipboard.writeText(placementClock.join(" "));
                       startTimer();
                     }}

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { TILE_RECOVERY } from "../particles/constants/game.constant";
+import IndicatorAtom from "../atoms/indicator.atom";
+import { TILE_RECOVERY } from "../particles/constants/setting.constant";
 import { useGameInteraction } from "../particles/context/game-interaction.context";
 import { useTimer } from "../particles/hooks/useTimer";
 import { Tile } from "../particles/types/game";
-import IndicatorAtom from "../atoms/indicator.atom";
 
 interface Props {
   tile: Tile;

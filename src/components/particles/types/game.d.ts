@@ -5,6 +5,7 @@ export interface Tile {
   clock: number;
   health: number;
   order: number;
+  recovery?: Date;
 }
 
 export interface Placement {
