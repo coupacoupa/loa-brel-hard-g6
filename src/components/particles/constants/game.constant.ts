@@ -1,5 +1,3 @@
-export const FAST_TILE_RECOVERY = 15;
-export const TILE_RECOVERY = 100;
 export const YELLOW_DAMAGE = 3;
 export const BLUE_DAMAGE = 1;
 

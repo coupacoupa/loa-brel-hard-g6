@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 
-export const useTimer = (initialTime: number, autoReset: boolean = false) => {
+export const useTimer = (initialTime: number) => {
   const [time, setTime] = useState(initialTime);
   const [isActive, setIsActive] = useState(false);
 
   const startTimer = () => {
-    setTime(initialTime);
     setIsActive(true);
   };
 
@@ -15,23 +14,19 @@ export const useTimer = (initialTime: number, autoReset: boolean = false) => {
   };
 
   useEffect(() => {
-    let interval: number;
+    let timeoutId: number;
 
-    if (isActive) {
-      interval = setInterval(() => {
+    if (isActive && time > 0) {
+      timeoutId = setTimeout(() => {
         setTime((time) => time - 1);
       }, 1000);
     }
 
-    if (time <= 0) {
-      if (autoReset) {
-        setTime(initialTime);
-      } else {
-        setIsActive(false);
-      }
+    if (time === 0) {
+      setIsActive(false);
     }
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(timeoutId);
   }, [isActive, time]);
 
   return { time, startTimer, resetTimer, isActive };
