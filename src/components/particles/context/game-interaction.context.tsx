@@ -32,6 +32,12 @@ interface Context {
     recalculate: () => void;
     clocks: number[];
   };
+  settings: {
+    autocopy: {
+      value: boolean;
+      setValue: React.Dispatch<React.SetStateAction<boolean>>;
+    };
+  };
 }
 
 const GameContext = createContext<Context>({
@@ -53,6 +59,12 @@ const GameContext = createContext<Context>({
     recalculate: () => {},
     clocks: [],
   },
+  settings: {
+    autocopy: {
+      value: false,
+      setValue: () => {},
+    },
+  },
 });
 
 export const GameInteractionProvider = ({ children }: Provider) => {
@@ -64,6 +76,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     useBlueMeteor();
   const { placements, calculatePlacement, resetPlacement, placementClocks } =
     usePlacement();
+  const [isAutocopy, setIsAutocopy] = useState(false);
 
   useEffect(() => {
     reset();
@@ -110,6 +123,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
 
   const dropYellow = (order: number) => {
     dropYellowMeteor(order, tiles);
+    recalculatePlacement();
   };
 
   return (
@@ -132,6 +146,12 @@ export const GameInteractionProvider = ({ children }: Provider) => {
           placements,
           recalculate: recalculatePlacement,
           clocks: placementClocks,
+        },
+        settings: {
+          autocopy: {
+            value: isAutocopy,
+            setValue: setIsAutocopy,
+          },
         },
       }}
     >
