@@ -12,6 +12,7 @@ interface Props {
 
 export default ({ tile }: Props) => {
   const {
+    game,
     meteor: { blue },
     recommendation,
   } = useGameInteraction();
@@ -49,8 +50,14 @@ export default ({ tile }: Props) => {
 
   return (
     <a
-      className={`flex aspect-square w-28 cursor-pointer select-none flex-col items-center justify-center text-neutral hover:border-2 hover:border-secondary-focus ${getTileColor()}`}
+      className={`flex aspect-square w-28 select-none flex-col items-center justify-center text-neutral ${getTileColor()} ${
+        game.isStarted
+          ? "cursor-pointer hover:border-2 hover:border-secondary-focus"
+          : "cursor-not-allowed"
+      }`}
       onClick={() => {
+        if (!game.isStarted) return;
+
         blue.drop(tile.order);
         tile.health--;
       }}

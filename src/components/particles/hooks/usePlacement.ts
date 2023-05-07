@@ -16,7 +16,7 @@ export default () => {
     currentTiles: Tiles;
     nextBlueCount: number;
   }>();
-  const debouncedValue = useDebounce(inputValue, 200);
+  const debouncedValue = useDebounce(inputValue, 100);
 
   const calculatePlacement = (currentTiles: Tiles, nextBlueCount: number) => {
     setInputValue({ nextBlueCount, currentTiles });

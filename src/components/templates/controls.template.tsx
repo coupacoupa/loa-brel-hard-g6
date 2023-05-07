@@ -34,6 +34,7 @@ export default () => {
           <ButtonAtom
             text="START"
             type="btn-primary"
+            disabled={game.isStarted}
             onClick={() => {
               game.start();
             }}
@@ -41,6 +42,7 @@ export default () => {
           <ButtonAtom
             text="RESET"
             type="btn-primary"
+            disabled={!game.isStarted}
             onClick={() => {
               game.reset();
             }}
@@ -97,6 +99,7 @@ export default () => {
             <ButtonAtom
               text={isActive ? "Copied" : "Copy"}
               type="btn-primary"
+              disabled={!game.isStarted}
               onClick={() => copyToClipboard()}
             />
           </div>
