@@ -3,24 +3,25 @@ import {
   CORNER_TILES,
   SPARE_TILES,
 } from "../constants/game.constant";
+import { BLUE_INTERVAL } from "../constants/setting.constant";
 import { Path, Tile, Tiles } from "../types/game";
+import { getTimeDifference } from "./date.util";
 import { getDirectionPriority } from "./game.util";
 
-export const getNextBluePlacement = (
-  nextBlueCount: number,
-  tiles: Tiles,
-  shandi: boolean
-) => {
-  console.log(
-    `calculating next placement - blue: ${nextBlueCount}, shandi: ${shandi}`
-  );
+export const getNextBluePlacement = (nextBlueCount: number, tiles: Tiles) => {
+  console.log(`calculating next placement - blue: ${nextBlueCount}`);
   // priority to place on (clock 11,12,1 order 1,2,5) or (clock 5,6,7 order 3,6,7) or (clock 7,9,11 order 3,0,1) or (clock 1,3,5 or 5,8,7)
   // max efficiency would be 3,2,2 = 7 damage before yellow
 
-  // get number of tiles already destroyed
-  const currentDestroyed = Object.values(tiles).reduce(
+  console.log("deb", tiles);
+
+  // get number of tiles destroyed 60 seconds from now
+  const destroyedTilesCount = Object.values(tiles).reduce(
     (count: number, tile: Tile) => {
-      if (tile.health <= 0) {
+      if (
+        tile.health <= 0 &&
+        getTimeDifference(tile.recovery) < BLUE_INTERVAL
+      ) {
         return count + 1;
       }
       return count;
@@ -28,7 +29,9 @@ export const getNextBluePlacement = (
     0
   );
 
-  let canDestroy = currentDestroyed === 0 && !shandi;
+  let canDestroy = destroyedTilesCount === 0;
+
+  console.log("destroyed", destroyedTilesCount, canDestroy);
 
   // stack and break
   if (canDestroy) {
@@ -47,7 +50,8 @@ export const stackAndBreak = (tiles: Tiles, nextBlueCount: number) => {
       return tiles[order].health === 1 || tiles[order].health === 2;
     });
 
-  console.log("stack priority debug", priorityOrder);
+  console.log("stackAndBreak debug", priorityOrder);
+
   let remainder = nextBlueCount;
   const path: number[] = [];
 
@@ -70,7 +74,12 @@ export const fillByPriority = (
   // get which have lower health
   const priorityOrder = [...getDirectionPriority(tiles), ...SPARE_TILES]
     .filter((x) => !excludeList.includes(x))
-    .filter((order) => tiles[order].health > 1);
+    .filter((order) => {
+      return (
+        tiles[order].health > 1 ||
+        getTimeDifference(tiles[order].recovery) < BLUE_INTERVAL
+      );
+    });
 
   console.log("priority debug", priorityOrder);
 

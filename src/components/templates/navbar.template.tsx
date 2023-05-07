@@ -1,11 +1,11 @@
-import ModalOraganism from "../organism/modal.oraganism";
+import ModalOrganism from "../organism/modal.organism";
 import NavbarOrganism from "../organism/navbar.organism";
 
 export default () => {
   return (
     <>
       <NavbarOrganism />
-      <ModalOraganism id="how-to-use-modal">
+      <ModalOrganism id="how-to-use-modal">
         <>
           <h1 className="mb-4 hidden text-center text-base font-medium sm:text-3xl md:block">
             How to use
@@ -21,7 +21,7 @@ export default () => {
             </ol>
           </div>
         </>
-      </ModalOraganism>
+      </ModalOrganism>
     </>
   );
 };
