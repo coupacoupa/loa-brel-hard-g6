@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Placement, Tiles } from "../types/game";
 import { getNextBluePlacement } from "../utils/blue.util";
 import {
@@ -7,12 +7,28 @@ import {
   getStartingTiles,
 } from "../utils/game.util";
 import { getNextYellowPlacement } from "../utils/yellow.util";
+import useDebounce from "./useDebounce";
 
 export default () => {
   const [placements, setPlacements] = useState<Placement>(getEmptyPlacement());
   const [placementClocks, setPlacementClocks] = useState<number[]>([]);
+  const [inputValue, setInputValue] = useState<{
+    currentTiles: Tiles;
+    nextBlueCount: number;
+  }>();
+  const debouncedValue = useDebounce(inputValue, 200);
 
   const calculatePlacement = (currentTiles: Tiles, nextBlueCount: number) => {
+    setInputValue({ nextBlueCount, currentTiles });
+  };
+
+  useEffect(() => {
+    // to handle when multiple tiles recover at once, eg when yellow destroys 3
+
+    if (!inputValue || !debouncedValue) return;
+
+    const { nextBlueCount, currentTiles } = debouncedValue;
+
     const newPlacement: Placement = { ...getEmptyPlacement() };
 
     // set new yellow placements
@@ -21,6 +37,8 @@ export default () => {
     if (order) {
       newPlacement[order].yellow = true;
     }
+
+    console.log("debug use placement", currentTiles);
 
     // set new blue placements
     const path = getNextBluePlacement(nextBlueCount, currentTiles);
@@ -36,7 +54,9 @@ export default () => {
     const clock = path.map((key) => tiles[key].clock);
 
     setPlacementClocks(clock);
-  };
+
+    setInputValue(undefined);
+  });
 
   const resetPlacement = () => {
     const newPlacement: Placement = { ...getEmptyPlacement() };

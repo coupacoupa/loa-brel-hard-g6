@@ -4,7 +4,7 @@ import {
   SPARE_TILES,
 } from "../constants/game.constant";
 import { BLUE_INTERVAL } from "../constants/setting.constant";
-import { Path, Tile, Tiles } from "../types/game";
+import { Path, Tiles } from "../types/game";
 import { getTimeDifference } from "./date.util";
 import { getDirectionPriority } from "./game.util";
 
@@ -13,31 +13,42 @@ export const getNextBluePlacement = (nextBlueCount: number, tiles: Tiles) => {
   // priority to place on (clock 11,12,1 order 1,2,5) or (clock 5,6,7 order 3,6,7) or (clock 7,9,11 order 3,0,1) or (clock 1,3,5 or 5,8,7)
   // max efficiency would be 3,2,2 = 7 damage before yellow
 
-  // get number of tiles destroyed 60 seconds from now
-  const destroyedTilesCount = Object.values(tiles).reduce(
-    (count: number, tile: Tile) => {
-      if (
-        tile.health <= 0 &&
-        getTimeDifference(tile.recovery) < BLUE_INTERVAL
-      ) {
-        return count + 1;
+  // remove recovery from tiles if recovering within blue meteor interval
+  let destroyedTilesCount = 0;
+  const recoveredTiles = Object.fromEntries(
+    Object.entries(tiles).map(([order, tile]) => {
+      const isDestroyed = tile.health <= 0;
+      let recoverInTime = false;
+
+      if (isDestroyed) {
+        const secondsToRecover = getTimeDifference(tile.recovery);
+        recoverInTime = secondsToRecover < BLUE_INTERVAL;
       }
-      return count;
-    },
-    0
-  );
+
+      if (isDestroyed && !recoverInTime) {
+        destroyedTilesCount++;
+      }
+
+      return [
+        order,
+        {
+          ...tile,
+          health: isDestroyed && recoverInTime ? 3 : tile.health,
+          recovery: !recoverInTime ? tile.recovery : undefined,
+        },
+      ];
+    })
+  ) as Tiles;
 
   let canDestroy = destroyedTilesCount === 0;
 
-  console.log("destroyed", destroyedTilesCount, canDestroy);
-
   // stack and break
   if (canDestroy) {
-    return stackAndBreak(tiles, nextBlueCount);
+    return stackAndBreak(recoveredTiles, nextBlueCount);
   }
 
   // count number of damage on both sides and get higher of both
-  return fillByPriority(tiles, nextBlueCount);
+  return fillByPriority(recoveredTiles, nextBlueCount);
 };
 
 export const stackAndBreak = (tiles: Tiles, nextBlueCount: number) => {
@@ -47,8 +58,6 @@ export const stackAndBreak = (tiles: Tiles, nextBlueCount: number) => {
     .filter((order) => {
       return tiles[order].health === 1 || tiles[order].health === 2;
     });
-
-  console.log("stackAndBreak debug", priorityOrder);
 
   let remainder = nextBlueCount;
   const path: number[] = [];
@@ -78,8 +87,6 @@ export const fillByPriority = (
         getTimeDifference(tiles[order].recovery) < BLUE_INTERVAL
       );
     });
-
-  console.log("priority debug", priorityOrder);
 
   // fills placements based on priority first
   // if both filled, then fill spare left right
