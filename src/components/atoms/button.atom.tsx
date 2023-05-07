@@ -2,11 +2,16 @@ interface Props {
   text: string;
   onClick: Function;
   type: "btn-primary" | "btn-secondary" | "btn-accent";
+  disabled?: boolean;
 }
 
-export default ({ text, onClick, type }: Props) => {
+export default ({ text, onClick, type, disabled = false }: Props) => {
   return (
-    <button onClick={() => onClick()} className={`${type} btn`}>
+    <button
+      disabled={disabled}
+      onClick={() => onClick()}
+      className={`${type} btn`}
+    >
       {text}
     </button>
   );

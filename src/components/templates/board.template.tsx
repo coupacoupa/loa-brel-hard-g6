@@ -3,13 +3,14 @@ import BoardOrganism from "../organism/board.organism";
 import { useGameInteraction } from "../particles/context/game-interaction.context";
 
 export default () => {
-  const { tiles, meteor } = useGameInteraction();
+  const { game, tiles, meteor } = useGameInteraction();
 
   return (
     <div className="col-span-2 flex h-full w-full grid-rows-3 flex-col items-center justify-center gap-2">
       <ButtonAtom
         text="YELLOW TOP"
         type="btn-accent"
+        disabled={!game.isStarted}
         onClick={() => {
           meteor.yellow.drop(2);
         }}
@@ -20,6 +21,7 @@ export default () => {
       <ButtonAtom
         text="YELLOW BOTTOM"
         type="btn-accent"
+        disabled={!game.isStarted}
         onClick={() => {
           meteor.yellow.drop(6);
         }}
