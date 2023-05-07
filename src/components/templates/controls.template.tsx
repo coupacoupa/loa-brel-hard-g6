@@ -49,32 +49,6 @@ export default () => {
           />
         </div>
       </InfoOrganism>
-      <InfoOrganism title="Blue Input">
-        <div className="grid w-3/4 grid-cols-4 place-items-center gap-2">
-          {Array.from({ length: meteor.blue.count }, (_, i) => (
-            <IndicatorAtom
-              key={i}
-              size={8}
-              background="blue"
-              focused={i < meteor.blue.blueInput.length}
-              text={i + 1}
-            />
-          ))}
-        </div>
-      </InfoOrganism>
-      <InfoOrganism title="Yellow Meteor">
-        <div className="grid w-3/4 grid-cols-4 place-items-center gap-2">
-          {Array.from(YELLOW_THRESHOLD, (_, i) => (
-            <IndicatorAtom
-              key={i}
-              size={8}
-              background="yellow"
-              focused={i < meteor.yellow.count}
-              text={YELLOW_THRESHOLD[i]}
-            />
-          ))}
-        </div>
-      </InfoOrganism>
       <InfoOrganism title="Clipboard">
         <div>
           <div className="form-control grid w-full grid-cols-3 gap-2 ">
@@ -103,6 +77,52 @@ export default () => {
               onClick={() => copyToClipboard()}
             />
           </div>
+        </div>
+      </InfoOrganism>
+      <InfoOrganism title="Yellow Meteor">
+        <div className="grid w-3/4 grid-cols-4 place-items-center gap-2">
+          {Array.from(YELLOW_THRESHOLD, (_, i) => (
+            <IndicatorAtom
+              key={i}
+              size={8}
+              background="yellow"
+              focused={i < meteor.yellow.count}
+              text={YELLOW_THRESHOLD[i]}
+            />
+          ))}
+        </div>
+      </InfoOrganism>
+      <InfoOrganism title="Blue Meteor">
+        <div className="grid w-3/4 grid-cols-4 place-items-center gap-2">
+          {Array.from({ length: meteor.blue.count }, (_, i) => (
+            <IndicatorAtom
+              key={i}
+              size={8}
+              background="blue"
+              focused={i < meteor.blue.blueInput.length}
+              text={i + 1}
+            />
+          ))}
+        </div>
+      </InfoOrganism>
+      <InfoOrganism title="Blue Correction">
+        <div className="grid w-full grid-cols-2 gap-2">
+          <ButtonAtom
+            text="UNDO"
+            type="btn-primary"
+            disabled={!game.isStarted}
+            onClick={() => {
+              game.start();
+            }}
+          />
+          <ButtonAtom
+            text="+1"
+            type="btn-primary"
+            disabled={!game.isStarted}
+            onClick={() => {
+              game.reset();
+            }}
+          />
         </div>
       </InfoOrganism>
     </div>
