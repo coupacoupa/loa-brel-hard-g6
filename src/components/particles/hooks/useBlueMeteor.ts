@@ -7,7 +7,6 @@ export default () => {
   const resetBlueMeteor = () => {
     setNextBlueCount(2);
     setBlueInput([]);
-    console.log("reset blue");
   };
 
   const inputBlueMeteor = (order: number) => {

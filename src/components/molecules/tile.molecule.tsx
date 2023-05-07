@@ -4,6 +4,7 @@ import { TILE_RECOVERY } from "../particles/constants/setting.constant";
 import { useGameInteraction } from "../particles/context/game-interaction.context";
 import { useTimer } from "../particles/hooks/useTimer";
 import { Tile } from "../particles/types/game";
+import { getDateSecondsFromNow } from "../particles/utils/date.util";
 
 interface Props {
   tile: Tile;
@@ -31,6 +32,7 @@ export default ({ tile }: Props) => {
     if (tile.health <= 0) {
       if (!isActive) {
         startTimer();
+        tile.recovery = getDateSecondsFromNow(TILE_RECOVERY);
       }
     } else {
       resetTimer();
@@ -40,6 +42,7 @@ export default ({ tile }: Props) => {
   useEffect(() => {
     if (time <= 0) {
       tile.health = 3;
+      tile.recovery = undefined;
       recommendation.recalculate();
     }
   }, [time]);
