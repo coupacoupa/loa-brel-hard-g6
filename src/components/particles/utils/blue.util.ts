@@ -13,8 +13,6 @@ export const getNextBluePlacement = (nextBlueCount: number, tiles: Tiles) => {
   // priority to place on (clock 11,12,1 order 1,2,5) or (clock 5,6,7 order 3,6,7) or (clock 7,9,11 order 3,0,1) or (clock 1,3,5 or 5,8,7)
   // max efficiency would be 3,2,2 = 7 damage before yellow
 
-  console.log("deb", tiles);
-
   // get number of tiles destroyed 60 seconds from now
   const destroyedTilesCount = Object.values(tiles).reduce(
     (count: number, tile: Tile) => {

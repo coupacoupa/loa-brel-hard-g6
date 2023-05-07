@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ButtonAtom from "../atoms/button.atom";
 import IndicatorAtom from "../atoms/indicator.atom";
 import InfoOrganism from "../organism/info.organism";
@@ -7,17 +7,25 @@ import { useGameInteraction } from "../particles/context/game-interaction.contex
 import { useTimer } from "../particles/hooks/useTimer";
 
 export default () => {
-  const { game, meteor, recommendation } = useGameInteraction();
+  const {
+    game,
+    meteor,
+    recommendation,
+    settings: { autocopy },
+  } = useGameInteraction();
   const { startTimer, resetTimer, isActive } = useTimer(1);
-  const [isAutocopy, setIsAutocopy] = useState(false);
 
   useEffect(() => {
-    if (isAutocopy) {
-      navigator.clipboard.writeText(recommendation.clocks.join(" "));
-      resetTimer();
-      startTimer();
+    if (autocopy.value) {
+      copyToClipboard();
     }
   }, [recommendation.clocks]);
+
+  const copyToClipboard = () => {
+    resetTimer();
+    navigator.clipboard.writeText(recommendation.clocks.join(" "));
+    startTimer();
+  };
 
   return (
     <div className="rounded-xl bg-info-content p-6">
@@ -81,7 +89,7 @@ export default () => {
                   type="checkbox"
                   className="toggle-primary toggle"
                   onChange={(e) => {
-                    setIsAutocopy(e.target.checked);
+                    autocopy.setValue(e.target.checked);
                   }}
                 ></input>
               </label>
@@ -89,11 +97,7 @@ export default () => {
             <ButtonAtom
               text={isActive ? "Copied" : "Copy"}
               type="btn-primary"
-              onClick={() => {
-                resetTimer();
-                navigator.clipboard.writeText(recommendation.clocks.join(" "));
-                startTimer();
-              }}
+              onClick={() => copyToClipboard()}
             />
           </div>
         </div>
