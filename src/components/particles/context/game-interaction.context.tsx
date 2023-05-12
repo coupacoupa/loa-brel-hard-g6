@@ -72,8 +72,13 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   const [isStarted, setIsStarted] = useState(false);
   const { dropYellowMeteor, resetYellowMeteor, yellowDropCount } =
     useYellowMeteor();
-  const { nextBlueCount, resetBlueMeteor, inputBlueMeteor, blueInput } =
-    useBlueMeteor();
+  const {
+    nextBlueCount,
+    resetBlueMeteor,
+    inputBlueMeteor,
+    blueInput,
+    time: nextBlueTime,
+  } = useBlueMeteor();
   const { placements, calculatePlacement, resetPlacement, placementClocks } =
     usePlacement();
   const [isAutocopy, setIsAutocopy] = useState(false);
@@ -84,7 +89,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
 
   useEffect(() => {
     if (nextBlueCount > 2) {
-      calculatePlacement(tiles, nextBlueCount);
+      calculatePlacement(tiles, nextBlueCount, nextBlueTime);
     }
   }, [nextBlueCount]);
 
@@ -111,14 +116,14 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     calculateBlueDamage(updatedTiles, path);
 
     // calculate new placements
-    calculatePlacement(updatedTiles, nextBlueCount);
+    calculatePlacement(updatedTiles, nextBlueCount, nextBlueTime);
 
     // update with placement
     setTiles(updatedTiles);
   };
 
   const recalculatePlacement = () => {
-    calculatePlacement(tiles, nextBlueCount);
+    calculatePlacement(tiles, nextBlueCount, nextBlueTime);
   };
 
   const dropYellow = (order: number) => {

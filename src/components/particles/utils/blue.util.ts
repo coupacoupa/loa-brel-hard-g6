@@ -8,7 +8,11 @@ import { Path, Tiles } from "../types/game";
 import { getTimeDifference } from "./date.util";
 import { getDirectionPriority } from "./game.util";
 
-export const getNextBluePlacement = (nextBlueCount: number, tiles: Tiles) => {
+export const getNextBluePlacement = (
+  nextBlueCount: number,
+  nextBlueTime: number,
+  tiles: Tiles
+) => {
   console.log(`calculating next placement - blue: ${nextBlueCount}`);
   // priority to place on (clock 11,12,1 order 1,2,5) or (clock 5,6,7 order 3,6,7) or (clock 7,9,11 order 3,0,1) or (clock 1,3,5 or 5,8,7)
   // max efficiency would be 3,2,2 = 7 damage before yellow
@@ -22,7 +26,7 @@ export const getNextBluePlacement = (nextBlueCount: number, tiles: Tiles) => {
 
       if (isDestroyed) {
         const secondsToRecover = getTimeDifference(tile.recovery);
-        recoverInTime = secondsToRecover < BLUE_INTERVAL;
+        recoverInTime = secondsToRecover < nextBlueTime;
       }
 
       if (isDestroyed && !recoverInTime) {

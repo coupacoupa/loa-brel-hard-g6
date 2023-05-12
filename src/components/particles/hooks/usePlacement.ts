@@ -15,11 +15,16 @@ export default () => {
   const [inputValue, setInputValue] = useState<{
     currentTiles: Tiles;
     nextBlueCount: number;
+    nextBlueTime: number;
   }>();
   const debouncedValue = useDebounce(inputValue, 100);
 
-  const calculatePlacement = (currentTiles: Tiles, nextBlueCount: number) => {
-    setInputValue({ nextBlueCount, currentTiles });
+  const calculatePlacement = (
+    currentTiles: Tiles,
+    nextBlueCount: number,
+    nextBlueTime: number
+  ) => {
+    setInputValue({ nextBlueCount, currentTiles, nextBlueTime });
   };
 
   useEffect(() => {
@@ -27,7 +32,7 @@ export default () => {
 
     if (!inputValue || !debouncedValue) return;
 
-    const { nextBlueCount, currentTiles } = debouncedValue;
+    const { nextBlueCount, nextBlueTime, currentTiles } = debouncedValue;
 
     const newPlacement: Placement = { ...getEmptyPlacement() };
 
@@ -38,10 +43,12 @@ export default () => {
       newPlacement[order].yellow = true;
     }
 
-    console.log("debug use placement", currentTiles);
-
     // set new blue placements
-    const path = getNextBluePlacement(nextBlueCount, currentTiles);
+    const path = getNextBluePlacement(
+      nextBlueCount,
+      nextBlueTime,
+      currentTiles
+    );
     for (let i = 0; i < path.length; i++) {
       const order = path[i];
       newPlacement[order].blue.push(i + 1);
