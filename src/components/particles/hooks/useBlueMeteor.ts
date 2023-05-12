@@ -1,12 +1,16 @@
 import { useState } from "react";
+import { useTimer } from "./useTimer";
+import { BLUE_INTERVAL } from "../constants/setting.constant";
 
 export default () => {
   const [nextBlueCount, setNextBlueCount] = useState<number>(2);
   const [blueInput, setBlueInput] = useState<number[]>([]);
+  const { startTimer, resetTimer, time } = useTimer(BLUE_INTERVAL);
 
   const resetBlueMeteor = () => {
     setNextBlueCount(2);
     setBlueInput([]);
+    resetTimer();
   };
 
   const inputBlueMeteor = (order: number) => {
@@ -18,6 +22,8 @@ export default () => {
       const newCount = nextBlueCount === 3 ? 4 : 3;
       setNextBlueCount(newCount);
       setBlueInput([]);
+      resetTimer();
+      startTimer();
     } else {
       setBlueInput(newBlueInput);
     }
@@ -28,5 +34,6 @@ export default () => {
     nextBlueCount,
     inputBlueMeteor,
     blueInput,
+    time,
   };
 };
