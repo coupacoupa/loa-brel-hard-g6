@@ -19,14 +19,6 @@ export default () => {
   }>();
   const debouncedValue = useDebounce(inputValue, 100);
 
-  const calculatePlacement = (
-    currentTiles: Tiles,
-    nextBlueCount: number,
-    nextBlueTime: number
-  ) => {
-    setInputValue({ nextBlueCount, currentTiles, nextBlueTime });
-  };
-
   useEffect(() => {
     // to handle when multiple tiles recover at once, eg when yellow destroys 3
 
@@ -63,7 +55,9 @@ export default () => {
     setPlacementClocks(clock);
 
     setInputValue(undefined);
-  });
+  }, [debouncedValue]);
+
+  const calculateUntimedPlacement = () => {};
 
   const resetPlacement = () => {
     const newPlacement: Placement = { ...getEmptyPlacement() };
@@ -85,7 +79,8 @@ export default () => {
 
   return {
     placements,
-    calculatePlacement,
+    calculateUntimedPlacement,
+    setInputValue,
     resetPlacement,
     placementClocks,
   };
