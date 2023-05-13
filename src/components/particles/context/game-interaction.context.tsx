@@ -91,7 +91,6 @@ export const GameInteractionProvider = ({ children }: Provider) => {
   } = useBlueMeteor();
   const {
     placements,
-    calculateUntimedPlacement,
     resetPlacement,
     placementClocks,
     setInputValue: setBlueInputValue,

@@ -57,8 +57,6 @@ export default () => {
     setInputValue(undefined);
   }, [debouncedValue]);
 
-  const calculateUntimedPlacement = () => {};
-
   const resetPlacement = () => {
     const newPlacement: Placement = { ...getEmptyPlacement() };
 
@@ -79,7 +77,6 @@ export default () => {
 
   return {
     placements,
-    calculateUntimedPlacement,
     setInputValue,
     resetPlacement,
     placementClocks,
