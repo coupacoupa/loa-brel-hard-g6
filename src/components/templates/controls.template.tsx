@@ -110,17 +110,23 @@ export default () => {
           <ButtonAtom
             text="UNDO"
             type="btn-primary"
-            disabled={!game.isStarted}
+            disabled={true}
             onClick={() => {
               game.start();
             }}
           />
           <ButtonAtom
-            text="+1"
+            text={meteor.blue.additional.isAdditional ? "Cancel" : "+1"}
             type="btn-primary"
             disabled={!game.isStarted}
             onClick={() => {
-              game.reset();
+              const {
+                blue: {
+                  additional: { isAdditional, setIsAdditional },
+                },
+              } = meteor;
+
+              setIsAdditional(!isAdditional);
             }}
           />
         </div>

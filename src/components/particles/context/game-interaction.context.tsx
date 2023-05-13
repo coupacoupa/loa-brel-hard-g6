@@ -21,6 +21,10 @@ interface Context {
       drop: (order: number) => void;
       count: number;
       blueInput: number[];
+      additional: {
+        isAdditional: boolean;
+        setIsAdditional: React.Dispatch<React.SetStateAction<boolean>>;
+      };
     };
     yellow: {
       drop: (order: number) => void;
@@ -48,6 +52,10 @@ const GameContext = createContext<Context>({
       drop: () => {},
       count: 2,
       blueInput: [],
+      additional: {
+        isAdditional: false,
+        setIsAdditional: () => {},
+      },
     },
     yellow: {
       drop: () => {},
@@ -78,9 +86,16 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     inputBlueMeteor,
     blueInput,
     time: nextBlueTime,
+    isAdditional,
+    setIsAdditional,
   } = useBlueMeteor();
-  const { placements, calculatePlacement, resetPlacement, placementClocks } =
-    usePlacement();
+  const {
+    placements,
+    calculateUntimedPlacement,
+    resetPlacement,
+    placementClocks,
+    setInputValue: setBlueInputValue,
+  } = usePlacement();
   const [isAutocopy, setIsAutocopy] = useState(false);
 
   useEffect(() => {
@@ -89,7 +104,7 @@ export const GameInteractionProvider = ({ children }: Provider) => {
 
   useEffect(() => {
     if (nextBlueCount > 2) {
-      calculatePlacement(tiles, nextBlueCount, nextBlueTime);
+      setBlueInputValue({ currentTiles: tiles, nextBlueCount, nextBlueTime });
     }
   }, [nextBlueCount]);
 
@@ -116,14 +131,18 @@ export const GameInteractionProvider = ({ children }: Provider) => {
     calculateBlueDamage(updatedTiles, path);
 
     // calculate new placements
-    calculatePlacement(updatedTiles, nextBlueCount, nextBlueTime);
+    setBlueInputValue({
+      currentTiles: updatedTiles,
+      nextBlueCount,
+      nextBlueTime,
+    });
 
     // update with placement
     setTiles(updatedTiles);
   };
 
   const recalculatePlacement = () => {
-    calculatePlacement(tiles, nextBlueCount, nextBlueTime);
+    setBlueInputValue({ currentTiles: tiles, nextBlueCount, nextBlueTime });
   };
 
   const dropYellow = (order: number) => {
@@ -141,6 +160,10 @@ export const GameInteractionProvider = ({ children }: Provider) => {
             blueInput,
             drop: inputBlueMeteor,
             count: nextBlueCount,
+            additional: {
+              isAdditional,
+              setIsAdditional,
+            },
           },
           yellow: {
             count: yellowDropCount,

@@ -58,7 +58,13 @@ export default ({ tile }: Props) => {
       onClick={() => {
         if (!game.isStarted) return;
 
-        blue.drop(tile.order);
+        if (!blue.additional.isAdditional) {
+          blue.drop(tile.order);
+        } else {
+          recommendation.recalculate();
+          blue.additional.setIsAdditional(false);
+        }
+
         tile.health--;
       }}
     >
